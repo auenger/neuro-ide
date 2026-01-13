@@ -1,0 +1,45 @@
+.layout-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #1e1e1e;
+}
+
+.resize-handle {
+  width: 6px;
+  background: #2d2d2d;
+  cursor: col-resize;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 100%;
+  background: #3d3d3d;
+}
+
+.resize-handle:hover {
+  background: #007acc;
+}
+
+.resize-handle:hover::before {
+  background: #0098ff;
+}
+
+.resize-handle:active {
+  background: #0098ff;
+}
+
+/* Panel base styles */
+.panel-base {
+  height: 100%;
+  overflow: hidden;
+  background: #1e1e1e;
+  color: #d4d4d4;
+}

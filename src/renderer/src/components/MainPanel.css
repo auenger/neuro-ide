@@ -1,0 +1,76 @@
+.main-panel {
+    border-right: 1px solid #2d2d2d;
+}
+
+.resize-handle-horizontal {
+    height: 4px;
+    background: #2d2d2d;
+    cursor: row-resize;
+    transition: background 0.2s;
+}
+
+.resize-handle-horizontal:hover {
+    background: #007acc;
+}
+
+.resize-handle-horizontal:active {
+    background: #0098ff;
+}
+
+.chat-console {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid #2d2d2d;
+    background: #252526;
+}
+
+.chat-header h4 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.control-btn {
+    background: transparent;
+    border: none;
+    color: #858585;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 3px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.control-btn:hover {
+    background: #2a2d2e;
+    color: #cccccc;
+}
+
+.control-btn:active {
+    background: #007acc;
+    color: #ffffff;
+}

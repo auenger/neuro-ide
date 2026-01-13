@@ -1,0 +1,146 @@
+.starred-files {
+    border-bottom: 1px solid #2d2d2d;
+    padding: 8px 0;
+}
+
+.starred-files h4 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.star-icon {
+    width: 14px;
+    height: 14px;
+    color: #ffd700;
+}
+
+.starred-list {
+    margin-top: 4px;
+}
+
+.starred-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+    user-select: none;
+}
+
+.starred-item:hover {
+    background: #2a2d2e;
+}
+
+.starred-item:hover .remove-btn {
+    opacity: 1;
+}
+
+.starred-item.dragging {
+    opacity: 0.5;
+}
+
+.starred-item.drag-over {
+    background: #094771;
+    border-top: 2px solid #007acc;
+}
+
+.starred-item .file-icon {
+    width: 16px;
+    height: 16px;
+    color: #858585;
+    flex-shrink: 0;
+}
+
+.starred-item .file-name {
+    flex: 1;
+    font-size: 13px;
+    color: #cccccc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.starred-item .remove-btn {
+    background: transparent;
+    border: none;
+    color: #858585;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 3px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    flex-shrink: 0;
+}
+
+.starred-item .remove-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.starred-item .remove-btn:hover {
+    background: #f48771;
+    color: #ffffff;
+}
+
+.starred-folder-content {
+    background: rgba(0, 0, 0, 0.1);
+    border-left: 1px solid #2d2d2d;
+    margin-left: 8px;
+}
+
+.starred-file-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 12px;
+}
+
+.starred-file-item:hover {
+    background: #2a2d2e;
+}
+
+.starred-file-item .tree-chevron {
+    width: 12px;
+    height: 12px;
+    color: #858585;
+    flex-shrink: 0;
+}
+
+.starred-file-item .file-icon {
+    width: 14px;
+    height: 14px;
+    color: #858585;
+    flex-shrink: 0;
+}
+
+.starred-file-item .file-name {
+    flex: 1;
+    font-size: 12px;
+    color: #cccccc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tree-chevron {
+    width: 12px;
+    height: 12px;
+    color: #858585;
+    flex-shrink: 0;
+}
