@@ -13,14 +13,6 @@ class SessionManager {
   private sessions: Map<string, pty.IPty> = new Map()
   private shell: string
   private workingDirectory: string
-  private outputFilters: RegExp[] = [
-    /The default interactive shell is now zsh\./,
-    /To update your account to use zsh, please run `chsh -s \/bin\/zsh`\./,
-    /For more details, please visit https:\/\/support\.apple\.com\/kb\/HT208050\./,
-    /\[Session exited: code=\d+, signal=\d+\]/,
-    /\[Press any key to restart session\]/
-  ]
-
   constructor(workingDirectory?: string) {
     this.shell = '/bin/bash'
     this.workingDirectory = workingDirectory || os.homedir()
@@ -28,16 +20,6 @@ class SessionManager {
 
   setWorkingDirectory(dir: string): void {
     this.workingDirectory = dir
-  }
-
-  private filterOutput(data: string): string {
-    let filtered = data
-    for (const filter of this.outputFilters) {
-      filtered = filtered.replace(filter, '')
-    }
-    // Remove empty lines that result from filtering
-    filtered = filtered.replace(/\n\s*\n/g, '\n')
-    return filtered
   }
 
   createSession(sessionId: string, mainWindow: BrowserWindow, customPrompt?: string): number | null {
@@ -152,7 +134,7 @@ class SessionManager {
 
 // File Watcher
 class FileWatcher {
-  private watcher: chokidar.FSWatcher | null = null
+  private watcher: ReturnType<typeof chokidar.watch> | null = null
   private mainWindow: BrowserWindow | null = null
 
   setMainWindow(window: BrowserWindow): void {
@@ -165,15 +147,30 @@ class FileWatcher {
     }
 
     this.watcher = chokidar.watch(directory, {
-      ignored: /(^|[\/\\])\../, // ignore dotfiles
+      ignored: (path) => {
+        // Explicitly ignore node_modules and other heavy/build directories
+        if (path.includes('node_modules')) return true
+        if (path.includes('.git')) return true
+        if (path.includes(directory + '/dist')) return true
+        if (path.includes(directory + '/out')) return true
+        if (path.includes(directory + '/build')) return true
+
+        // Check for hidden files/folders (starting with .) but allow .neuro
+        const basename = path.split(/[/\\]/).pop() || ''
+        if (basename.startsWith('.') && basename !== '.neuro') return true
+
+        return false
+      },
       persistent: true,
-      ignoreInitial: true
+      ignoreInitial: true,
+      ignorePermissionErrors: true
     })
 
     this.watcher
       .on('add', (path) => this.notify('add', path))
       .on('change', (path) => this.notify('change', path))
       .on('unlink', (path) => this.notify('unlink', path))
+      .on('error', (error) => console.error('FileWatcher error:', error))
 
     console.log('Watching directory:', directory)
   }

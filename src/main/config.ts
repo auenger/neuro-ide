@@ -1,18 +1,12 @@
-import { join, dirname } from 'path'
+import { join } from 'path'
 import fs from 'fs/promises'
-import { existsSync, mkdirSync } from 'fs'
-
-interface ConfigManagerOptions {
-    workspacePath: string
-}
+import { existsSync } from 'fs'
 
 export class ConfigManager {
-    private workspacePath: string
     private configDir: string
     private globalConfigDir: string
 
     constructor(workspacePath: string) {
-        this.workspacePath = workspacePath
         this.configDir = join(workspacePath, '.neuro')
         // Use a fixed location for global settings, independent of workspace
         const homeDir = process.env.HOME || process.env.USERPROFILE || ''

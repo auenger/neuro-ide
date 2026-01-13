@@ -15,6 +15,7 @@ interface Window {
             removeListener(channel: string, func: (...args: any[]) => void): void
             removeAllListeners(channel: string): void
         }
+        process: any
     }
     api: {
         workspace: {
