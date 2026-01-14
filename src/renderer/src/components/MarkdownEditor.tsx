@@ -5,7 +5,7 @@ import { useAppStore } from '../store/appStore'
 import Toast from './Toast'
 import './MarkdownEditor.css'
 
-const MarkdownEditor = () => {
+const MarkdownEditor = ({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {
     const {
         sessions,
         activeSessionId,
@@ -132,26 +132,45 @@ const MarkdownEditor = () => {
                                 <polyline points="7 3 7 8 15 8"></polyline>
                             </svg>
                         </button>
+                        {onToggleCollapse && (
+                            <button
+                                className="btn-icon"
+                                onClick={onToggleCollapse}
+                                title={isCollapsed ? "展开编辑器" : "折叠编辑器"}
+                            >
+                                {isCollapsed ? (
+                                    <svg viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M3.72 7.47a.75.75 0 0 1 1.06 0L8 10.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-3.75 3.75a.75.75 0 0 1-1.06 0L3.72 8.53a.75.75 0 0 1 0-1.06Z"></path>
+                                    </svg>
+                                ) : (
+                                    <svg viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"></path>
+                                    </svg>
+                                )}
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
-            <div className="editor-content">
-                {(markdownViewMode === 'source' || markdownViewMode === 'split') && (
-                    <div className="editor-pane">
-                        <textarea
-                            value={markdown}
-                            onChange={(e) => handleMarkdownChange(e.target.value)}
-                            placeholder="在此编写 Markdown..."
-                            spellCheck={false}
-                        />
-                    </div>
-                )}
-                {(markdownViewMode === 'preview' || markdownViewMode === 'split') && (
-                    <div className="preview-pane">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
-                    </div>
-                )}
-            </div>
+            {!isCollapsed && (
+                <div className="editor-content">
+                    {(markdownViewMode === 'source' || markdownViewMode === 'split') && (
+                        <div className="editor-pane">
+                            <textarea
+                                value={markdown}
+                                onChange={(e) => handleMarkdownChange(e.target.value)}
+                                placeholder="在此编写 Markdown..."
+                                spellCheck={false}
+                            />
+                        </div>
+                    )}
+                    {(markdownViewMode === 'preview' || markdownViewMode === 'split') && (
+                        <div className="preview-pane">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Toast Notification */}
             {toast && (

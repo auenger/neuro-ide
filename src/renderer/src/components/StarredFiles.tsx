@@ -25,6 +25,11 @@ const StarredFiles = () => {
     const [draggedItem, setDraggedItem] = useState<string | null>(null)
     const [dragOverItem, setDragOverItem] = useState<string | null>(null)
     const [expandedFolders, setExpandedFolders] = useState<Map<string, FileNode[]>>(new Map())
+    const [contextMenu, setContextMenu] = useState<{
+        x: number
+        y: number
+        node: FileNode
+    } | null>(null)
 
     // Load folder contents when starred
     useEffect(() => {
@@ -163,6 +168,38 @@ const StarredFiles = () => {
         removeStarredItem(itemId)
     }
 
+    const handleContextMenu = (e: React.MouseEvent, node: FileNode) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setContextMenu({
+            x: e.clientX,
+            y: e.clientY,
+            node
+        })
+    }
+
+    const handleCopyFilename = async () => {
+        if (contextMenu) {
+            try {
+                await navigator.clipboard.writeText(contextMenu.node.name)
+                console.log('Copied filename:', contextMenu.node.name)
+            } catch (err) {
+                console.error('Failed to copy filename:', err)
+            }
+        }
+        setContextMenu(null)
+    }
+
+    // Close context menu on click outside
+    useEffect(() => {
+        const handleClick = () => setContextMenu(null)
+        if (contextMenu) {
+            document.addEventListener('click', handleClick)
+            return () => document.removeEventListener('click', handleClick)
+        }
+        return undefined
+    }, [contextMenu])
+
     const renderFileTree = (nodes: FileNode[], depth: number = 0): React.ReactNode => {
         return nodes.map((node) => {
             const isExpanded = expandedFolders.has(node.path)
@@ -174,6 +211,7 @@ const StarredFiles = () => {
                         className="starred-file-item"
                         style={{ paddingLeft: `${12 + depth * 16}px` }}
                         onClick={() => handleFileClick(node)}
+                        onContextMenu={(e) => handleContextMenu(e, node)}
                     >
                         {node.isDirectory && (
                             <svg
@@ -241,6 +279,7 @@ const StarredFiles = () => {
                                     onDrop={(e) => handleDrop(e, item.id)}
                                     onDragEnd={handleDragEnd}
                                     onClick={() => item.isDirectory ? toggleFolder(item.path, children) : handleFileClick(item)}
+                                    onContextMenu={(e) => handleContextMenu(e, item)}
                                 >
                                     {item.isDirectory && (
                                         <svg
@@ -287,6 +326,27 @@ const StarredFiles = () => {
                         )
                     })}
             </div>
+
+            {/* Context Menu */}
+            {contextMenu && (
+                <div
+                    className="context-menu"
+                    style={{
+                        position: 'fixed',
+                        left: `${contextMenu.x}px`,
+                        top: `${contextMenu.y}px`,
+                        zIndex: 1000
+                    }}
+                >
+                    <div className="context-menu-item" onClick={handleCopyFilename}>
+                        <svg viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
+                            <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+                        </svg>
+                        复制文件名
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

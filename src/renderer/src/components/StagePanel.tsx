@@ -83,7 +83,7 @@ const StagePanel = () => {
                     <h4>编辑器 / Diff 视图</h4>
                     {currentFile && (
                         <div className="file-info">
-                            <span className="current-file">{currentFile.split('/').pop()}</span>
+                            <span className="current-file">{currentFile.split(/[/\\]/).pop()}</span>
                             {changedFiles.has(currentFile) && <span className="file-modified">●</span>}
                         </div>
                     )}

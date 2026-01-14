@@ -17,6 +17,75 @@
     background: #0098ff;
 }
 
+/* Markdown Panel */
+.markdown-panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+}
+
+.markdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid #2d2d2d;
+    background: #252526;
+}
+
+.markdown-header h4 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.markdown-editor-container {
+    flex: 1;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.markdown-editor-container.hidden {
+    display: none;
+}
+
+.collapse-btn,
+.expand-btn {
+    background: transparent;
+    border: none;
+    color: #858585;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 3px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.collapse-btn svg,
+.expand-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.collapse-btn:hover,
+.expand-btn:hover {
+    background: #2a2d2e;
+    color: #cccccc;
+}
+
+.collapse-btn:active,
+.expand-btn:active {
+    background: #007acc;
+    color: #ffffff;
+}
+
+/* Chat Console */
 .chat-console {
     height: 100%;
     display: flex;
@@ -31,6 +100,12 @@
     padding: 8px 16px;
     border-bottom: 1px solid #2d2d2d;
     background: #252526;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .chat-header h4 {
@@ -73,4 +148,155 @@
 .control-btn:active {
     background: #007acc;
     color: #ffffff;
+}
+
+/* Terminal Tabs */
+.terminal-tabs {
+    background: #1e1e1e;
+    border-bottom: 1px solid #2d2d2d;
+    padding: 0 8px;
+}
+
+.tabs-list {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.tabs-list::-webkit-scrollbar {
+    height: 4px;
+}
+
+.tabs-list::-webkit-scrollbar-thumb {
+    background: #3e3e42;
+    border-radius: 2px;
+}
+
+.terminal-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    color: #858585;
+    cursor: pointer;
+    font-size: 12px;
+    border-top: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.terminal-tab:hover {
+    background: #2a2d2e;
+    color: #cccccc;
+}
+
+.terminal-tab.active {
+    background: #1e1e1e;
+    color: #ffffff;
+    border-top-color: #007acc;
+}
+
+.tab-name {
+    user-select: none;
+}
+
+.tab-close {
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+
+.tab-close svg {
+    width: 12px;
+    height: 12px;
+}
+
+.tab-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+}
+
+.tab-edit {
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.tab-edit svg {
+    width: 12px;
+    height: 12px;
+}
+
+.terminal-tab:hover .tab-edit {
+    opacity: 0.6;
+}
+
+.tab-edit:hover {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 1 !important;
+}
+
+.add-terminal-btn {
+    background: transparent;
+    border: none;
+    color: #858585;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.add-terminal-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.add-terminal-btn:hover {
+    background: #2a2d2e;
+    color: #cccccc;
+}
+
+.add-terminal-btn:active {
+    background: #007acc;
+    color: #ffffff;
+}
+
+.tab-name-input {
+    background: #2d2d2d;
+    border: 1px solid #007acc;
+    color: #ffffff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    outline: none;
+    min-width: 80px;
+    max-width: 150px;
+}
+
+.tab-name-input:focus {
+    border-color: #0098ff;
+    box-shadow: 0 0 0 1px #0098ff;
 }

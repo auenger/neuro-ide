@@ -20,6 +20,15 @@ export interface Session {
     prompt: string
     customPrompt?: string
     ptyPid?: number
+    terminals: TerminalInstance[] // Multiple terminal instances
+    activeTerminalId: string // Currently active terminal in this session
+}
+
+export interface TerminalInstance {
+    id: string // Unique ID for this terminal instance
+    sessionId: string // Parent session ID
+    name: string // Display name like "Terminal 1", "Terminal 2"
+    ptyPid?: number
 }
 
 export interface FileEntry {
@@ -54,6 +63,12 @@ interface AppState {
     // Session management
     sessions: Session[]
     activeSessionId: string
+
+    // Terminal instance management
+    addTerminalToSession: (sessionId: string) => void
+    removeTerminalFromSession: (sessionId: string, terminalId: string) => void
+    setActiveTerminal: (sessionId: string, terminalId: string) => void
+    renameTerminal: (sessionId: string, terminalId: string, newName: string) => void
 
     // Starred files
     starredItems: StarredItem[]
@@ -90,6 +105,34 @@ interface AppState {
     setCurrentFileContent: (content: string) => void
     setOriginalFileContent: (content: string) => void
     setEditorMode: (mode: 'editor' | 'diff' | 'terminal') => void
+}
+
+// Helper function to create a new terminal instance
+const createTerminalInstance = (sessionId: string, index: number = 1): TerminalInstance => ({
+    id: `${sessionId}-terminal-${index}-${Date.now()}`,
+    sessionId,
+    name: `Terminal ${index}`,
+    ptyPid: undefined
+})
+
+// Helper function to create a session with default terminal
+const createSession = (role: RoleConfig): Session => {
+    const terminalId = `${role.id}-terminal-1-${Date.now()}`
+    return {
+        id: role.id,
+        role: role.id,
+        name: role.name,
+        icon: role.icon,
+        prompt: role.prompt,
+        customPrompt: role.customPrompt,
+        terminals: [{
+            id: terminalId,
+            sessionId: role.id,
+            name: 'Terminal 1',
+            ptyPid: undefined
+        }],
+        activeTerminalId: terminalId
+    }
 }
 
 const DEFAULT_ROLES: RoleConfig[] = [
@@ -148,50 +191,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     // Default built-in roles
     roles: DEFAULT_ROLES,
 
-    sessions: [
-        {
-            id: 'architect',
-            role: 'architect',
-            name: '架构师',
-            icon: 'home',
-            prompt: `# 架构师角色
-
-你是一个资深的系统架构师,负责:
-- 设计系统架构
-- 技术选型
-- 性能优化
-- 代码审查`,
-            customPrompt: '[架构师]$ '
-        },
-        {
-            id: 'frontend',
-            role: 'frontend',
-            name: '前端工程师',
-            icon: 'monitor',
-            prompt: `# 前端工程师角色
-
-你是一个前端开发专家,负责:
-- UI/UX 实现
-- 前端框架开发
-- 性能优化
-- 响应式设计`,
-            customPrompt: '[前端]$ '
-        },
-        {
-            id: 'backend',
-            role: 'backend',
-            name: '后端工程师',
-            icon: 'server',
-            prompt: `# 后端工程师角色
-
-你是一个后端开发专家,负责:
-- API 设计与实现
-- 数据库设计
-- 服务器架构
-- 安全与性能`,
-            customPrompt: '[后端]$ '
-        }
-    ],
+    sessions: DEFAULT_ROLES.map(role => createSession(role)),
     activeSessionId: 'architect',
     starredItems: [],
     fileTree: [],
@@ -239,14 +239,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                     // Reconstruct sessions from ACTIVE roles only
                     const sessions = mergedRoles
                         .filter(role => role.isActive)
-                        .map(role => ({
-                            id: role.id,
-                            role: role.id,
-                            name: role.name,
-                            icon: role.icon,
-                            prompt: role.prompt,
-                            customPrompt: role.customPrompt
-                        }))
+                        .map(role => createSession(role))
 
                     set({
                         roles: mergedRoles,
@@ -273,14 +266,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     // Role management
     addRole: (role) => set((state) => {
         const newRoles = [...state.roles, role]
-        const newSessions = [...state.sessions, {
-            id: role.id,
-            role: role.id,
-            name: role.name,
-            icon: role.icon,
-            prompt: role.prompt,
-            customPrompt: role.customPrompt
-        }]
+        const newSessions = [...state.sessions, createSession(role)]
 
         if (state.workspacePath && window.api?.config) {
             // Save roles globally
@@ -431,6 +417,75 @@ export const useAppStore = create<AppState>((set, get) => ({
     setEditorMode: (mode) => set({ editorMode: mode }),
 
     setMarkdownViewMode: (mode) => set({ markdownViewMode: mode }),
+
+    // Terminal instance management
+    addTerminalToSession: (sessionId) => set((state) => {
+        const session = state.sessions.find(s => s.id === sessionId)
+        if (!session) return state
+
+        const newTerminalIndex = session.terminals.length + 1
+        const newTerminal = createTerminalInstance(sessionId, newTerminalIndex)
+
+        const newSessions = state.sessions.map(s =>
+            s.id === sessionId
+                ? {
+                    ...s,
+                    terminals: [...s.terminals, newTerminal],
+                    activeTerminalId: newTerminal.id
+                }
+                : s
+        )
+
+        return { sessions: newSessions }
+    }),
+
+    removeTerminalFromSession: (sessionId, terminalId) => set((state) => {
+        const session = state.sessions.find(s => s.id === sessionId)
+        if (!session || session.terminals.length <= 1) return state // Keep at least one terminal
+
+        const newTerminals = session.terminals.filter(t => t.id !== terminalId)
+        const newActiveTerminalId = session.activeTerminalId === terminalId
+            ? newTerminals[0].id
+            : session.activeTerminalId
+
+        const newSessions = state.sessions.map(s =>
+            s.id === sessionId
+                ? {
+                    ...s,
+                    terminals: newTerminals,
+                    activeTerminalId: newActiveTerminalId
+                }
+                : s
+        )
+
+        return { sessions: newSessions }
+    }),
+
+    setActiveTerminal: (sessionId, terminalId) => set((state) => {
+        const newSessions = state.sessions.map(s =>
+            s.id === sessionId
+                ? { ...s, activeTerminalId: terminalId }
+                : s
+        )
+        return { sessions: newSessions }
+    }),
+
+    renameTerminal: (sessionId, terminalId, newName) => set((state) => {
+        const newSessions = state.sessions.map(s => {
+            if (s.id === sessionId) {
+                return {
+                    ...s,
+                    terminals: s.terminals.map(t =>
+                        t.id === terminalId
+                            ? { ...t, name: newName }
+                            : t
+                    )
+                }
+            }
+            return s
+        })
+        return { sessions: newSessions }
+    }),
 
     checkUnsavedChanges: null,
     setCheckUnsavedChanges: (check) => set({ checkUnsavedChanges: check })

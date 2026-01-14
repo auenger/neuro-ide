@@ -20,18 +20,30 @@ Last Updated: Jan 2026
 - **Native Terminal Integration**: Powered by `node-pty` for real system process management.
 - **High-Performance Rendering**: Utilizes `xterm.js` for a smooth, native-like terminal experience.
 - **Role-Based Sessions**: Supports multiple persistent terminal sessions (e.g., Architect, Frontend, Backend) with independent command history and state.
+- **Multi-Terminal Instances**: Each role can have multiple terminal tabs, allowing parallel command execution.
+- **Terminal Management**: 
+  - Create unlimited terminal instances per role
+  - Switch between terminals with intuitive tab interface
+  - Rename terminals with inline editing
+  - Quick restart and clear screen functions
+  - Close individual terminals (minimum one per role)
+- **Cross-Platform Support**: Full compatibility with Windows, macOS, and Linux
+- **Copy/Paste Support**: Right-click paste and keyboard shortcuts (Ctrl/Cmd+C/V) in terminals
 
 #### 2. The Interface (Layout & Design)
 - **Flexible 3-Pane Layout**: Adjustable Sidebar, Main Panel (Markdown/Chat), and Stage Panel (Code Editor).
 - **Professional UI**: Dark theme inspired by VS Code, featuring SVG icons and a clean aesthetic.
 - **Markdown Studio**: Integrated dual-pane Markdown editor with real-time GitHub Flavored Markdown preview.
+- **Collapsible Panels**: Markdown editor can be collapsed to maximize terminal space.
+- **Terminal Tabs**: Clean tab interface for managing multiple terminal instances.
 
 #### 3. The Workspace (File & Project Management)
 - **Workspace Management**: Open and switch local directories, with automatic terminal session migration.
 - **Recursive File Tree**: Infinite nesting, automatic sorting, and real-time file watching via `chokidar`.
-- **Global Search**: Deep file search capability, powered by recursive backend search, accessible directly from the sidebar.
+- **Global Search**: Deep file search capability with filename prioritization, powered by recursive backend search.
 - **Monaco Editor Support**: Full-featured code editing (VS Code engine) with syntax highlighting for major languages.
 - **Custom Role Management**: Create, edit, and manage custom roles. Roles are saved globally, with per-workspace activation settings.
+- **Starred Files**: Quick access to frequently used files and folders with drag-to-reorder support.
 
 ## 🛠 Tech Stack
 

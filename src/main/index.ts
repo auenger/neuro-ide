@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, nativeTheme } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -14,8 +14,16 @@ class SessionManager {
   private shell: string
   private workingDirectory: string
   constructor(workingDirectory?: string) {
-    this.shell = '/bin/bash'
+    // Detect platform and set appropriate shell
+    if (process.platform === 'win32') {
+      // On Windows, try PowerShell first, fallback to cmd.exe
+      this.shell = process.env.SHELL || 'powershell.exe'
+    } else {
+      // On macOS/Linux, use bash or zsh
+      this.shell = process.env.SHELL || '/bin/bash'
+    }
     this.workingDirectory = workingDirectory || os.homedir()
+    console.log(`SessionManager initialized with shell: ${this.shell}, cwd: ${this.workingDirectory}`)
   }
 
   setWorkingDirectory(dir: string): void {
@@ -33,15 +41,30 @@ class SessionManager {
     }
 
     try {
+      // Platform-aware environment setup
+      const isWindows = process.platform === 'win32'
       const env = Object.assign({}, process.env, {
         TERM: 'xterm-256color',
         COLORTERM: 'truecolor',
-        HOME: process.env.HOME || os.homedir(),
-        PATH: process.env.PATH || '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
+        // Disable zsh's % marker at end of partial lines
+        PROMPT_EOL_MARK: ''
       })
 
-      // Add custom PS1 if provided
-      if (customPrompt) {
+      // Set HOME/USERPROFILE based on platform
+      if (isWindows) {
+        env.USERPROFILE = process.env.USERPROFILE || os.homedir()
+        if (!env.PATH) {
+          env.PATH = 'C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\Wbem'
+        }
+      } else {
+        env.HOME = process.env.HOME || os.homedir()
+        if (!env.PATH) {
+          env.PATH = '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
+        }
+      }
+
+      // Add custom PS1 if provided (Unix only)
+      if (customPrompt && !isWindows) {
         env.PS1 = customPrompt
       }
 
@@ -197,6 +220,13 @@ function createWindow(): BrowserWindow {
     height: 900,
     show: false,
     autoHideMenuBar: true,
+    title: 'Neuro',
+    backgroundColor: '#1b1b1f', // Match the app's dark theme
+    // Use default Windows title bar with dark theme
+    ...(process.platform === 'win32' ? {
+      titleBarStyle: 'default',
+      frame: true
+    } : {}),
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -204,9 +234,18 @@ function createWindow(): BrowserWindow {
     }
   })
 
+  // Apply Windows dark mode to title bar
+  if (process.platform === 'win32') {
+    // This requires Windows 10 build 17763 or later
+    nativeTheme.themeSource = 'dark'
+  }
+
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
-    mainWindow.webContents.openDevTools()
+    // Only open DevTools in development mode
+    if (is.dev) {
+      mainWindow.webContents.openDevTools()
+    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -293,39 +332,56 @@ app.whenReady().then(() => {
   ipcMain.handle('fs:searchInWorkspace', async (_, { workspacePath, query }) => {
     if (!workspacePath || !query) return []
 
-    const results: any[] = []
+    const filenameMatches: any[] = []
+    const contentMatches: any[] = []
     const MAX_RESULTS = 1000
 
     async function searchRecursively(dir: string) {
-      if (results.length >= MAX_RESULTS) return
+      if (filenameMatches.length + contentMatches.length >= MAX_RESULTS) return
 
       try {
         const files = await fs.readdir(dir, { withFileTypes: true })
 
         for (const file of files) {
-          if (results.length >= MAX_RESULTS) return
+          if (filenameMatches.length + contentMatches.length >= MAX_RESULTS) return
           const fullPath = join(dir, file.name)
 
           if (file.isDirectory()) {
             if (['node_modules', '.git', 'dist', 'out', 'build', '.idea', '.vscode'].includes(file.name)) continue
             await searchRecursively(fullPath)
           } else {
+            // Check if filename matches (case-insensitive)
+            const isFilenameMatch = file.name.toLowerCase().includes(query.toLowerCase())
+
             // Skip binary or large files check could go here
             // For now simply try to read as text
             if (['.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.mp3', '.wav', '.zip', '.tar', '.gz', '.7z', '.pdf', '.exe', '.dll', '.so', '.dylib', '.class', '.pyc'].some(ext => file.name.endsWith(ext))) continue
 
+            if (isFilenameMatch) {
+              // Add filename match with special marker
+              filenameMatches.push({
+                file: file.name,
+                path: fullPath,
+                line: 0, // 0 indicates filename match
+                content: `📄 文件名匹配: ${file.name}`,
+                isFilenameMatch: true
+              })
+            }
+
+            // Search in file content
             try {
               const content = await fs.readFile(fullPath, 'utf-8')
               const lines = content.split('\n')
 
               lines.forEach((line, index) => {
-                if (results.length >= MAX_RESULTS) return
+                if (filenameMatches.length + contentMatches.length >= MAX_RESULTS) return
                 if (line.includes(query)) {
-                  results.push({
+                  contentMatches.push({
                     file: file.name,
                     path: fullPath,
                     line: index + 1,
-                    content: line.trim()
+                    content: line.trim(),
+                    isFilenameMatch: false
                   })
                 }
               })
@@ -340,7 +396,9 @@ app.whenReady().then(() => {
     }
 
     await searchRecursively(workspacePath)
-    return results
+
+    // Return filename matches first, then content matches
+    return [...filenameMatches, ...contentMatches]
   })
 
   // Config IPC handlers

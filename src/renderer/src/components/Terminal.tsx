@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { Terminal as XTerm } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
-import { useAppStore, Session } from '../store/appStore'
+import { useAppStore, Session, TerminalInstance } from '../store/appStore'
 import 'xterm/css/xterm.css'
 
 const Terminal = () => {
     const containerRef = useRef<HTMLDivElement>(null)
     const terminalsRef = useRef<Map<string, { xterm: XTerm; fitAddon: FitAddon }>>(new Map())
-    const exitedSessionsRef = useRef<Set<string>>(new Set())
+    const exitedTerminalsRef = useRef<Set<string>>(new Set())
 
     // We use a ref for listeners to clean them up properly on unmount
     const listenersCleanupRef = useRef<Array<() => void>>([])
@@ -15,39 +15,47 @@ const Terminal = () => {
     // Store access
     const activeSessionId = useAppStore((state) => state.activeSessionId)
     const sessions = useAppStore((state) => state.sessions)
-    // Only used for full resets if needed, but we rely on sessions array now
     const workspaceChangeCounter = useAppStore((state) => state.workspaceChangeCounter)
+
+    // Get active session and its active terminal
+    const activeSession = sessions.find(s => s.id === activeSessionId)
+    const activeTerminalId = activeSession?.activeTerminalId
 
     // Initial setup of global listeners
     useEffect(() => {
-        // Handle incoming data from backend
-        const removeIncomingListener = window.api.session.onIncoming((sessionId, data) => {
-            const terminalInstance = terminalsRef.current.get(sessionId)
+        // Handle incoming data from backend - now using terminalId
+        const removeIncomingListener = window.api.session.onIncoming((terminalId, data) => {
+            const terminalInstance = terminalsRef.current.get(terminalId)
             if (terminalInstance) {
                 terminalInstance.xterm.write(data)
             }
         })
 
-        // Handle session exit
-        const removeExitListener = window.api.session.onExited((sessionId, exitCode, signal) => {
-            const terminalInstance = terminalsRef.current.get(sessionId)
+        // Handle session exit - now using terminalId
+        const removeExitListener = window.api.session.onExited((terminalId, exitCode, signal) => {
+            const terminalInstance = terminalsRef.current.get(terminalId)
             if (terminalInstance) {
                 terminalInstance.xterm.write(`\r\n\r\n[Session exited: code=${exitCode}, signal=${signal}]\r\n`)
                 terminalInstance.xterm.write(`[Press any key to restart session]\r\n`)
-                exitedSessionsRef.current.add(sessionId)
+                exitedTerminalsRef.current.add(terminalId)
             }
         })
 
         // Setup resize observer for container
         const resizeObserver = new ResizeObserver(() => {
-            const activeSessionId = useAppStore.getState().activeSessionId
-            const activeTerminal = terminalsRef.current.get(activeSessionId)
-            if (activeTerminal) {
-                try {
-                    activeTerminal.fitAddon.fit()
-                    window.api.session.resize(activeSessionId, activeTerminal.xterm.cols, activeTerminal.xterm.rows)
-                } catch (e) {
-                    console.warn('Failed to resize terminal:', e)
+            const state = useAppStore.getState()
+            const activeSession = state.sessions.find(s => s.id === state.activeSessionId)
+            const activeTerminalId = activeSession?.activeTerminalId
+
+            if (activeTerminalId) {
+                const activeTerminal = terminalsRef.current.get(activeTerminalId)
+                if (activeTerminal) {
+                    try {
+                        activeTerminal.fitAddon.fit()
+                        window.api.session.resize(activeTerminalId, activeTerminal.xterm.cols, activeTerminal.xterm.rows)
+                    } catch (e) {
+                        console.warn('Failed to resize terminal:', e)
+                    }
                 }
             }
         })
@@ -61,6 +69,36 @@ const Terminal = () => {
         listenersCleanupRef.current.push(removeExitListener)
         listenersCleanupRef.current.push(() => resizeObserver.disconnect())
 
+        // Listen for restart events from UI
+        const handleRestart = async (e: Event) => {
+            const event = e as CustomEvent
+            const { terminalId, customPrompt } = event.detail
+
+            const terminalInstance = terminalsRef.current.get(terminalId)
+            if (terminalInstance) {
+                // Kill the process
+                await window.api.session.kill(terminalId)
+
+                // Reset the terminal display
+                terminalInstance.xterm.reset()
+
+                // Remove from exited set if it was there
+                exitedTerminalsRef.current.delete(terminalId)
+
+                // Wait a bit
+                await new Promise(resolve => setTimeout(resolve, 100))
+
+                // Create new session
+                const { success, pid } = await window.api.session.create(terminalId, customPrompt)
+                if (success) {
+                    terminalInstance.xterm.write(`\r\n[Terminal restarted with PID: ${pid}]\r\n`)
+                }
+            }
+        }
+
+        window.addEventListener('terminal-restart', handleRestart)
+        listenersCleanupRef.current.push(() => window.removeEventListener('terminal-restart', handleRestart))
+
         return () => {
             // Cleanup listeners on unmount
             listenersCleanupRef.current.forEach(cb => cb())
@@ -68,18 +106,18 @@ const Terminal = () => {
         }
     }, [])
 
-    // Function to create a terminal instance
-    const createTerminalInstance = (session: Session) => {
+    // Function to create a terminal instance for a TerminalInstance
+    const createTerminalInstance = (session: Session, terminalInstance: TerminalInstance) => {
         if (!containerRef.current) return
 
-        console.log(`Creating terminal for session: ${session.id}`)
+        console.log(`Creating terminal for: ${terminalInstance.id}`)
 
-        const sessionId = session.id
+        const terminalId = terminalInstance.id
         const terminalDiv = document.createElement('div')
         terminalDiv.style.width = '100%'
         terminalDiv.style.height = '100%'
         terminalDiv.style.display = 'none' // Hidden by default
-        terminalDiv.dataset.sessionId = sessionId
+        terminalDiv.dataset.terminalId = terminalId
         containerRef.current.appendChild(terminalDiv)
 
         const terminal = new XTerm({
@@ -90,7 +128,12 @@ const Terminal = () => {
                 background: '#1e1e1e',
                 foreground: '#d4d4d4',
                 cursor: '#ffffff'
-            }
+            },
+            // Enable copy/paste functionality
+            rightClickSelectsWord: false, // Allow right-click for context menu
+            allowTransparency: false,
+            // Enable selection and clipboard
+            convertEol: true
         })
 
         const fitAddon = new FitAddon()
@@ -104,69 +147,115 @@ const Terminal = () => {
 
         // Handle input
         terminal.onData((data) => {
-            if (exitedSessionsRef.current.has(sessionId)) {
+            if (exitedTerminalsRef.current.has(terminalId)) {
                 // Restart session
                 terminal.reset()
-                exitedSessionsRef.current.delete(sessionId)
+                exitedTerminalsRef.current.delete(terminalId)
 
                 // Get latest prompt from store just in case
-                const currentSession = useAppStore.getState().sessions.find(s => s.id === sessionId)
+                const currentSession = useAppStore.getState().sessions.find(s => s.id === session.id)
                 const prompt = currentSession?.customPrompt || session.customPrompt
 
-                window.api.session.create(sessionId, prompt).then(({ success, pid }) => {
+                window.api.session.create(terminalId, prompt).then(({ success, pid }) => {
                     if (success) {
                         terminal.write(`\r\n[Session restarted with PID: ${pid}]\r\n`)
                     }
                 })
             } else {
-                window.api.session.input(sessionId, data)
+                window.api.session.input(terminalId, data)
+            }
+        })
+
+        // Add right-click paste support
+        terminalDiv.addEventListener('contextmenu', async (e) => {
+            e.preventDefault()
+            try {
+                const text = await navigator.clipboard.readText()
+                if (text) {
+                    terminal.paste(text)
+                }
+            } catch (err) {
+                console.warn('Failed to read clipboard:', err)
+            }
+        })
+
+        // Add keyboard shortcuts for copy/paste
+        terminalDiv.addEventListener('keydown', async (e) => {
+            // Ctrl+V or Cmd+V for paste
+            if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                e.preventDefault()
+                try {
+                    const text = await navigator.clipboard.readText()
+                    if (text) {
+                        terminal.paste(text)
+                    }
+                } catch (err) {
+                    console.warn('Failed to read clipboard:', err)
+                }
+            }
+            // Ctrl+C or Cmd+C for copy (only if text is selected)
+            else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                const selection = terminal.getSelection()
+                if (selection) {
+                    e.preventDefault()
+                    try {
+                        await navigator.clipboard.writeText(selection)
+                    } catch (err) {
+                        console.warn('Failed to write to clipboard:', err)
+                    }
+                }
+                // If no selection, let the default Ctrl+C behavior (send interrupt signal) proceed
             }
         })
 
         // Store instance
-        terminalsRef.current.set(sessionId, { xterm: terminal, fitAddon })
+        terminalsRef.current.set(terminalId, { xterm: terminal, fitAddon })
 
         // Create backend session
-        window.api.session.create(sessionId, session.customPrompt).then(({ success, pid }) => {
+        window.api.session.create(terminalId, session.customPrompt).then(({ success, pid }) => {
             if (success) {
-                console.log(`Session ${sessionId} created with PID:`, pid)
+                console.log(`Terminal ${terminalId} created with PID:`, pid)
             } else {
-                terminal.write(`\r\nFailed to create session ${sessionId}\r\n`)
+                terminal.write(`\r\nFailed to create terminal ${terminalId}\r\n`)
             }
         })
     }
 
     // Effect to manage terminal instances based on sessions array
     useEffect(() => {
-        // 1. Create terminals for new sessions
+        // 1. Create terminals for new terminal instances
         sessions.forEach(session => {
-            if (!terminalsRef.current.has(session.id)) {
-                createTerminalInstance(session)
-            }
+            session.terminals.forEach(terminalInstance => {
+                if (!terminalsRef.current.has(terminalInstance.id)) {
+                    createTerminalInstance(session, terminalInstance)
+                }
+            })
         })
 
-        // 2. Remove terminals for deleted sessions
-        const currentSessionIds = new Set(sessions.map(s => s.id))
-        terminalsRef.current.forEach((term, sessionId) => {
-            if (!currentSessionIds.has(sessionId)) {
-                console.log(`Removing terminal for session: ${sessionId}`)
+        // 2. Remove terminals for deleted terminal instances
+        const currentTerminalIds = new Set(
+            sessions.flatMap(s => s.terminals.map(t => t.id))
+        )
+        terminalsRef.current.forEach((term, terminalId) => {
+            if (!currentTerminalIds.has(terminalId)) {
+                console.log(`Removing terminal: ${terminalId}`)
                 term.xterm.dispose()
-                terminalsRef.current.delete(sessionId)
+                terminalsRef.current.delete(terminalId)
 
                 // Remove DOM element
-                const el = containerRef.current?.querySelector(`[data-session-id="${sessionId}"]`)
+                const el = containerRef.current?.querySelector(`[data-terminal-id="${terminalId}"]`)
                 if (el) el.remove()
 
-                // Kill backend session if possible (though deleteRole logic might not assume kill)
-                window.api.session.kill(sessionId).catch(() => { })
+                // Kill backend session
+                window.api.session.kill(terminalId).catch(() => { })
             }
         })
 
     }, [sessions])
 
-    // Effect working on active session switching
+    // Effect working on active terminal switching
     useEffect(() => {
-        if (!containerRef.current) return
+        if (!containerRef.current || !activeTerminalId) return
 
         // Hide all
         Array.from(containerRef.current.children).forEach((el) => {
@@ -174,12 +263,12 @@ const Terminal = () => {
         })
 
         // Show active
-        const activeEl = containerRef.current.querySelector(`[data-session-id="${activeSessionId}"]`) as HTMLElement
+        const activeEl = containerRef.current.querySelector(`[data-terminal-id="${activeTerminalId}"]`) as HTMLElement
         if (activeEl) {
             activeEl.style.display = 'block'
 
             // Fit and Focus
-            const instance = terminalsRef.current.get(activeSessionId)
+            const instance = terminalsRef.current.get(activeTerminalId)
             if (instance) {
                 setTimeout(() => {
                     instance.fitAddon.fit()
@@ -187,7 +276,7 @@ const Terminal = () => {
                 }, 50)
             }
         }
-    }, [activeSessionId, sessions]) // Also run when sessions change (e.g. newly created one becomes active)
+    }, [activeTerminalId, sessions]) // Also run when sessions change (e.g. newly created one becomes active)
 
     // Full cleanup on workspace change (hard reset)
     useEffect(() => {
@@ -198,12 +287,12 @@ const Terminal = () => {
         terminalsRef.current.clear()
         if (containerRef.current) containerRef.current.innerHTML = ''
 
-        // Trigger recreation by forcing update? 
-        // Actually, since terminalsRef is empty, the [sessions] effect will recreate them if sessions didn't change.
-        // But [sessions] effect depends on `sessions` ref. 
-        // We might need to manually trigger recreation here.
-
-        sessions.forEach(session => createTerminalInstance(session))
+        // Trigger recreation
+        sessions.forEach(session => {
+            session.terminals.forEach(terminalInstance => {
+                createTerminalInstance(session, terminalInstance)
+            })
+        })
     }, [workspaceChangeCounter])
 
     return <div ref={containerRef} style={{ width: '100%', height: '100%', overflow: 'hidden', background: '#1e1e1e' }} />

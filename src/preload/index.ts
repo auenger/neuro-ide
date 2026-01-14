@@ -35,7 +35,7 @@ const api = {
 
   // Session management
   session: {
-    create: (sessionId: string) => ipcRenderer.invoke('session:create', sessionId),
+    create: (sessionId: string, customPrompt?: string) => ipcRenderer.invoke('session:create', sessionId, customPrompt),
     input: (sessionId: string, data: string) => ipcRenderer.send('session:input', { sessionId, data }),
     resize: (sessionId: string, cols: number, rows: number) =>
       ipcRenderer.send('session:resize', { sessionId, cols, rows }),
