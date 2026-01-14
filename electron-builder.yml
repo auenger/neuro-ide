@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: neuro-ide
+appId: com.neuro.app
+productName: Neuro
 directories:
   buildResources: build
 files:
@@ -12,7 +12,8 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: neuro-ide
+  executableName: Neuro
+  icon: resources/logo256.png
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
