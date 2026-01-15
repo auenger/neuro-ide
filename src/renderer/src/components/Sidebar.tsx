@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '../store/appStore'
 import StarredFiles from './StarredFiles'
+import ChangedFiles from './ChangedFiles'
 import RoleManager from './RoleManager'
 import { getIcon as getRoleIcon } from '../utils/icons'
 import { getIcon } from 'material-file-icons'
@@ -29,7 +30,8 @@ const Sidebar = () => {
         starredItems,
         addStarredItem,
         removeStarredItem,
-        checkUnsavedChanges
+        checkUnsavedChanges,
+        addFileChange
     } = useAppStore()
 
     // Reload roles when workspace path changes or on mount if path exists
@@ -280,8 +282,20 @@ const Sidebar = () => {
 
     // Listen for file changes
     useEffect(() => {
-        const removeListener = window.api.fs.onFileChanged((event, path) => {
-            console.log(`File ${event}: `, path)
+        const removeListener = window.api.fs.onFileChanged((data: {
+            event: string;
+            path: string;
+            timestamp?: number
+        }) => {
+            console.log(`File ${data.event}:`, data.path)
+
+            // Add to file changes tracking
+            addFileChange({
+                path: data.path,
+                changeType: data.event as 'add' | 'change' | 'unlink',
+                timestamp: data.timestamp || Date.now()
+            })
+
             // Reload file tree if workspace is set
             if (workspacePath) {
                 loadDirectory(workspacePath)
@@ -289,14 +303,19 @@ const Sidebar = () => {
         })
 
         return removeListener
-    }, [workspacePath])
+    }, [workspacePath, addFileChange])
 
 
 
     return (
         <div className="panel-base sidebar">
             <div className="sidebar-header">
-                <h3>资源管理器</h3>
+                <h3>
+                    资源管理器
+                    {workspacePath && (
+                        <span className="workspace-path"> - {workspacePath.split(/[/\\]/).pop()}</span>
+                    )}
+                </h3>
                 <button className="workspace-btn" onClick={handleSelectWorkspace} title="选择工作目录">
                     <svg viewBox="0 0 16 16" fill="currentColor">
                         <path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path>
@@ -334,6 +353,9 @@ const Sidebar = () => {
                 {/* Starred Files */}
                 <StarredFiles />
 
+                {/* Changed Files */}
+                <ChangedFiles />
+
                 <div className="file-tree">
                     <div className="search-container">
                         <div className="search-input-wrapper">
@@ -363,12 +385,9 @@ const Sidebar = () => {
                         </div>
                     </div>
 
-                    <h4>
-                        {searchQuery ? '搜索结果' : '文件树'}
-                        {workspacePath && (
-                            <span className="workspace-path"> ({workspacePath.split('/').pop()})</span>
-                        )}
-                    </h4>
+                    <div className="section-header">
+                        {/* <h4>{searchQuery ? '搜索结果' : '文件树'}</h4> */}
+                    </div>
 
                     {searchQuery ? (
                         <div className="search-results">
@@ -423,39 +442,43 @@ const Sidebar = () => {
             </div>
 
             {/* Context Menu */}
-            {contextMenu && (
-                <div
-                    className="context-menu"
-                    style={{
-                        position: 'fixed',
-                        left: `${contextMenu.x}px`,
-                        top: `${contextMenu.y}px`,
-                        zIndex: 1000
-                    }}
-                >
-                    {isStarred(contextMenu.node.path) ? (
-                        <div className="context-menu-item" onClick={handleRemoveFromStarred}>
-                            <svg viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
-                            </svg>
-                            取消星标
-                        </div>
-                    ) : (
-                        <div className="context-menu-item" onClick={handleAddToStarred}>
-                            <svg viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
-                            </svg>
-                            添加到星标
-                        </div>
-                    )}
-                </div>
-            )}
+            {
+                contextMenu && (
+                    <div
+                        className="context-menu"
+                        style={{
+                            position: 'fixed',
+                            left: `${contextMenu.x}px`,
+                            top: `${contextMenu.y}px`,
+                            zIndex: 1000
+                        }}
+                    >
+                        {isStarred(contextMenu.node.path) ? (
+                            <div className="context-menu-item" onClick={handleRemoveFromStarred}>
+                                <svg viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
+                                </svg>
+                                取消星标
+                            </div>
+                        ) : (
+                            <div className="context-menu-item" onClick={handleAddToStarred}>
+                                <svg viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
+                                </svg>
+                                添加到星标
+                            </div>
+                        )}
+                    </div>
+                )
+            }
 
             {/* Role Manager */}
-            {showRoleManager && (
-                <RoleManager onClose={() => setShowRoleManager(false)} />
-            )}
-        </div>
+            {
+                showRoleManager && (
+                    <RoleManager onClose={() => setShowRoleManager(false)} />
+                )
+            }
+        </div >
     )
 }
 

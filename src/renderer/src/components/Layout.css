@@ -2,15 +2,17 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #1e1e1e;
+  background: var(--cc-bg-primary);
+  animation: fade-in 0.3s ease-out;
 }
 
 .resize-handle {
-  width: 6px;
-  background: #2d2d2d;
+  width: 4px;
+  background: var(--cc-border-primary);
   cursor: col-resize;
-  transition: background 0.2s;
+  transition: all var(--transition-base);
   position: relative;
+  z-index: 10;
 }
 
 .resize-handle::before {
@@ -21,25 +23,29 @@
   transform: translateX(-50%);
   width: 1px;
   height: 100%;
-  background: #3d3d3d;
+  background: var(--cc-border-secondary);
+  opacity: 0;
+  transition: opacity var(--transition-base);
 }
 
 .resize-handle:hover {
-  background: #007acc;
+  background: var(--cc-accent-primary);
 }
 
 .resize-handle:hover::before {
-  background: #0098ff;
+  opacity: 1;
+  background: var(--cc-accent-primary);
 }
 
 .resize-handle:active {
-  background: #0098ff;
+  background: var(--cc-accent-secondary);
 }
 
 /* Panel base styles */
 .panel-base {
   height: 100%;
   overflow: hidden;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--cc-bg-secondary);
+  color: var(--cc-text-primary);
+  border-right: 1px solid var(--cc-border-primary);
 }

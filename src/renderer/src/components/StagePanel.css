@@ -1,67 +1,93 @@
 .stage-panel {
     display: flex;
     flex-direction: column;
+    background: var(--cc-bg-secondary);
 }
 
 .stage-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 16px;
-    border-bottom: 1px solid #2d2d2d;
-    background: #252526;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--cc-border-primary);
+    background: var(--cc-bg-tertiary);
+    position: relative;
+}
+
+.stage-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            var(--cc-warning) 50%,
+            transparent 100%);
+    opacity: 0.2;
 }
 
 .stage-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
 .stage-title h4 {
     margin: 0;
-    font-size: 12px;
-    font-weight: 600;
-    color: #cccccc;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cc-warning);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1.5px;
+    font-family: var(--font-display);
 }
 
 .file-info {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .current-file {
     font-size: 12px;
-    color: #858585;
-    font-weight: normal;
+    color: var(--cc-text-secondary);
+    font-weight: 500;
+    font-family: var(--font-mono);
 }
 
 .file-modified {
-    color: #4fc3f7;
+    color: var(--cc-accent-secondary);
     font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .stage-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
 .save-btn {
     background: transparent;
-    border: 1px solid #2d2d2d;
-    color: #858585;
+    border: 1px solid var(--cc-border-secondary);
+    color: var(--cc-text-tertiary);
     font-size: 11px;
-    padding: 4px 10px;
+    padding: 6px 12px;
     cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.2s;
+    border-radius: 2px;
+    transition: all var(--transition-base);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .save-btn svg {
@@ -70,9 +96,15 @@
 }
 
 .save-btn:hover {
-    background: #2a2d2e;
-    border-color: #4fc3f7;
-    color: #4fc3f7;
+    background: var(--cc-bg-elevated);
+    border-color: var(--cc-accent-primary);
+    color: var(--cc-accent-primary);
+    
+}
+
+.save-btn:active {
+    background: var(--cc-accent-primary);
+    color: var(--cc-bg-primary);
 }
 
 .stage-tabs {
@@ -82,37 +114,44 @@
 
 .tab {
     background: transparent;
-    border: none;
-    color: #858585;
-    font-size: 12px;
-    padding: 4px 12px;
+    border: 1px solid var(--cc-border-secondary);
+    color: var(--cc-text-tertiary);
+    font-size: 11px;
+    padding: 6px 14px;
     cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.2s;
+    border-radius: 2px;
+    transition: all var(--transition-base);
     display: flex;
     align-items: center;
     gap: 6px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .tab svg {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
 }
 
 .tab:hover {
-    background: #2a2d2e;
-    color: #cccccc;
+    background: var(--cc-bg-elevated);
+    color: var(--cc-text-primary);
+    border-color: var(--cc-accent-secondary);
 }
 
 .tab.active {
-    background: #37373d;
-    color: #ffffff;
+    background: var(--cc-bg-elevated);
+    color: var(--cc-accent-secondary);
+    border-color: var(--cc-accent-secondary);
+    
 }
 
 .stage-content {
     flex: 1;
     overflow: hidden;
-    background: #1e1e1e;
+    background: var(--cc-bg-primary);
 }
 
 .placeholder {
@@ -121,25 +160,30 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #858585;
+    color: var(--cc-text-tertiary);
     text-align: center;
     padding: 40px;
 }
 
 .placeholder-icon {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 16px;
-    opacity: 0.5;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+    opacity: 0.3;
     stroke-width: 1.5;
+    color: var(--cc-accent-secondary);
+    
 }
 
 .placeholder p {
-    margin: 8px 0;
+    margin: 10px 0;
     font-size: 14px;
+    color: var(--cc-text-secondary);
+    font-family: var(--font-mono);
 }
 
 .placeholder-hint {
     font-size: 12px;
-    color: #656565;
+    color: var(--cc-text-muted);
+    font-family: var(--font-mono);
 }

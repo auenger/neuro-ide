@@ -10,12 +10,19 @@ interface RoleManagerProps {
 const ICONS = ['home', 'monitor', 'server', 'settings', 'user', 'code', 'terminal', 'database', 'cloud']
 
 const RoleManager = ({ onClose }: RoleManagerProps) => {
-    const { roles, addRole, updateRole, deleteRole } = useAppStore()
+    const {
+        roles,
+        addRole,
+        updateRole,
+        deleteRole,
+        terminalNotificationSettings,
+        setTerminalNotificationEnabled
+    } = useAppStore()
     const [selectedRoleId, setSelectedRoleId] = useState<string | null>(roles[0]?.id || null)
     const [editForm, setEditForm] = useState<RoleConfig | null>(null)
 
     useEffect(() => {
-        if (selectedRoleId) {
+        if (selectedRoleId && selectedRoleId !== 'settings') {
             const role = roles.find(r => r.id === selectedRoleId)
             if (role) {
                 setEditForm({ ...role })
@@ -93,6 +100,20 @@ const RoleManager = ({ onClose }: RoleManagerProps) => {
                                 </div>
                             ))}
                         </div>
+                        <div className="settings-divider" style={{
+                            height: '1px',
+                            background: 'var(--cc-border-primary)',
+                            margin: '8px 0'
+                        }} />
+                        <div
+                            className={`role-list-item ${selectedRoleId === 'settings' ? 'active' : ''}`}
+                            onClick={() => setSelectedRoleId('settings')}
+                        >
+                            <span className="role-name" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ width: '14px', height: '14px' }}>{getIcon('settings')}</span>
+                                全局设置
+                            </span>
+                        </div>
                     </div>
 
                     <div className="role-editor">
@@ -159,6 +180,36 @@ const RoleManager = ({ onClose }: RoleManagerProps) => {
                                         <button className="delete-btn" onClick={handleDelete}>删除角色</button>
                                     )}
                                     <button className="save-btn" onClick={handleSave}>保存更改</button>
+                                </div>
+                            </div>
+                        ) : selectedRoleId === 'settings' ? (
+                            <div className="editor-form">
+                                <div className="form-section-title" style={{
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    color: 'var(--cc-text-primary)',
+                                    marginBottom: '16px',
+                                    borderBottom: '1px solid var(--cc-border-primary)',
+                                    paddingBottom: '8px'
+                                }}>
+                                    终端监控设置
+                                </div>
+
+                                <div className="form-group row">
+                                    <div
+                                        className="toggle-switch-wrapper"
+                                        onClick={() => setTerminalNotificationEnabled(!terminalNotificationSettings.enabled)}
+                                    >
+                                        <div className={`toggle-switch ${terminalNotificationSettings.enabled ? 'checked' : ''}`}>
+                                            <div className="toggle-knob"></div>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            <span>启用终端活跃度监控</span>
+                                            <span style={{ fontSize: '11px', color: 'var(--cc-text-muted)', fontWeight: 'normal' }}>
+                                                当终端长时间停止输出时显示通知
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ) : (

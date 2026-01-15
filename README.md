@@ -44,6 +44,8 @@ Last Updated: Jan 2026
 - **Monaco Editor Support**: Full-featured code editing (VS Code engine) with syntax highlighting for major languages.
 - **Custom Role Management**: Create, edit, and manage custom roles. Roles are saved globally, with per-workspace activation settings.
 - **Starred Files**: Quick access to frequently used files and folders with drag-to-reorder support.
+- **Changed Files Tracking**: Automatically tracks and lists modified files, with options to clear or add specific files to Starred list.
+- **Terminal Inactivity Monitor**: Configurable notifications for terminal inactivity, managed via Global Settings in Role Manager.
 
 ## 🛠 Tech Stack
 

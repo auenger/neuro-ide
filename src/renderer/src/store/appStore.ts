@@ -47,6 +47,27 @@ export interface StarredItem {
 
 export type MarkdownViewMode = 'source' | 'preview' | 'split'
 
+// File change tracking
+export interface FileChangeInfo {
+    path: string
+    changeType: 'add' | 'change' | 'unlink'
+    timestamp: number
+}
+
+// Terminal activity tracking
+export interface TerminalActivityState {
+    terminalId: string
+    lastOutputTime: number
+    isActive: boolean // Is currently outputting
+    hasNotified: boolean // Has shown completion notification
+}
+
+// Terminal notification settings
+export interface TerminalNotificationSettings {
+    enabled: boolean
+    inactiveThreshold: number // milliseconds
+}
+
 interface AppState {
     // Workspace
     workspacePath: string | null
@@ -80,10 +101,27 @@ interface AppState {
     fileTree: FileEntry[]
     setFileTree: (files: FileEntry[]) => void
 
-    // File watching
+    // File watching (legacy - kept for backward compatibility)
     changedFiles: Set<string>
     addChangedFile: (path: string) => void
     clearChangedFiles: () => void
+
+    // Enhanced file change tracking
+    fileChanges: Map<string, FileChangeInfo>
+    addFileChange: (info: FileChangeInfo) => void
+    removeFileChange: (path: string) => void
+    clearFileChanges: () => void
+
+    // Terminal activity tracking
+    terminalActivities: Map<string, TerminalActivityState>
+    updateTerminalActivity: (terminalId: string, isActive: boolean) => void
+    markTerminalNotified: (terminalId: string) => void
+    getInactiveTerminals: () => TerminalActivityState[]
+
+    // Terminal notification settings
+    terminalNotificationSettings: TerminalNotificationSettings
+    setTerminalNotificationEnabled: (enabled: boolean) => void
+    setTerminalNotificationThreshold: (threshold: number) => void
 
     // Editor state
     currentFile: string | null
@@ -202,6 +240,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     editorMode: 'editor',
     markdownViewMode: 'split',
 
+    // Enhanced file change tracking
+    fileChanges: new Map(),
+    terminalActivities: new Map(),
+
+    // Terminal notification settings
+    terminalNotificationSettings: {
+        enabled: false, // Default to off
+        inactiveThreshold: 2000 // 2 seconds
+    },
+
     // Actions
     setWorkspacePath: async (path) => {
         set({ workspacePath: path })
@@ -250,6 +298,22 @@ export const useAppStore = create<AppState>((set, get) => ({
                             ? (sessions.find(s => s.id === get().activeSessionId) ? get().activeSessionId : sessions[0].id)
                             : 'architect'
                     })
+
+                    // Load global settings
+                    const savedSettings = await window.api.config.load({
+                        workspacePath: path,
+                        filename: 'settings.json',
+                        defaultValue: {
+                            terminalNotification: {
+                                enabled: false,
+                                inactiveThreshold: 2000
+                            }
+                        }
+                    })
+
+                    if (savedSettings && savedSettings.terminalNotification) {
+                        set({ terminalNotificationSettings: savedSettings.terminalNotification })
+                    }
                 }
             } catch (e) {
                 console.error('Failed to load config:', e)
@@ -407,6 +471,108 @@ export const useAppStore = create<AppState>((set, get) => ({
     }),
 
     clearChangedFiles: () => set({ changedFiles: new Set() }),
+
+    // Enhanced file change tracking methods
+    addFileChange: (info) => set((state) => {
+        const newMap = new Map(state.fileChanges)
+        newMap.set(info.path, info)
+        // Also update legacy changedFiles for backward compatibility
+        const newSet = new Set(state.changedFiles)
+        newSet.add(info.path)
+        return { fileChanges: newMap, changedFiles: newSet }
+    }),
+
+    removeFileChange: (path) => set((state) => {
+        const newMap = new Map(state.fileChanges)
+        newMap.delete(path)
+        const newSet = new Set(state.changedFiles)
+        newSet.delete(path)
+        return { fileChanges: newMap, changedFiles: newSet }
+    }),
+
+    clearFileChanges: () => set({
+        fileChanges: new Map(),
+        changedFiles: new Set()
+    }),
+
+    // Terminal activity tracking methods
+    updateTerminalActivity: (terminalId, isActive) => set((state) => {
+        const newMap = new Map(state.terminalActivities)
+        const existing = newMap.get(terminalId)
+
+        newMap.set(terminalId, {
+            terminalId,
+            lastOutputTime: Date.now(),
+            isActive,
+            hasNotified: existing?.hasNotified || false
+        })
+
+        return { terminalActivities: newMap }
+    }),
+
+    markTerminalNotified: (terminalId) => set((state) => {
+        const newMap = new Map(state.terminalActivities)
+        const existing = newMap.get(terminalId)
+
+        if (existing) {
+            newMap.set(terminalId, {
+                ...existing,
+                hasNotified: true
+            })
+        }
+
+        return { terminalActivities: newMap }
+    }),
+
+    getInactiveTerminals: () => {
+        const state = get()
+        const now = Date.now()
+        const threshold = state.terminalNotificationSettings.inactiveThreshold
+
+        if (!state.terminalNotificationSettings.enabled) {
+            return []
+        }
+
+        return Array.from(state.terminalActivities.values())
+            .filter(activity =>
+                !activity.isActive &&
+                !activity.hasNotified &&
+                (now - activity.lastOutputTime) >= threshold
+            )
+    },
+
+    // Terminal notification settings methods
+    setTerminalNotificationEnabled: (enabled) => {
+        const currentSettings = get().terminalNotificationSettings
+        const newSettings = { ...currentSettings, enabled }
+
+        set({ terminalNotificationSettings: newSettings })
+
+        const workspacePath = get().workspacePath
+        if (workspacePath && window.api?.config) {
+            window.api.config.save({
+                workspacePath,
+                filename: 'settings.json',
+                data: { terminalNotification: newSettings }
+            })
+        }
+    },
+
+    setTerminalNotificationThreshold: (threshold) => {
+        const currentSettings = get().terminalNotificationSettings
+        const newSettings = { ...currentSettings, inactiveThreshold: threshold }
+
+        set({ terminalNotificationSettings: newSettings })
+
+        const workspacePath = get().workspacePath
+        if (workspacePath && window.api?.config) {
+            window.api.config.save({
+                workspacePath,
+                filename: 'settings.json',
+                data: { terminalNotification: newSettings }
+            })
+        }
+    },
 
     setCurrentFile: (path) => set({ currentFile: path }),
 

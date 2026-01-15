@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '../store/appStore'
 import { getIcon } from 'material-file-icons'
+import Toast from './Toast'
 import './StarredFiles.css'
 
 interface FileNode {
@@ -30,6 +31,7 @@ const StarredFiles = () => {
         y: number
         node: FileNode
     } | null>(null)
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'warning' | 'error' } | null>(null)
 
     // Load folder contents when starred
     useEffect(() => {
@@ -178,16 +180,16 @@ const StarredFiles = () => {
         })
     }
 
-    const handleCopyFilename = async () => {
-        if (contextMenu) {
-            try {
-                await navigator.clipboard.writeText(contextMenu.node.name)
-                console.log('Copied filename:', contextMenu.node.name)
-            } catch (err) {
-                console.error('Failed to copy filename:', err)
-            }
+    const handleCopyFilename = async (e: React.MouseEvent, filename: string) => {
+        e.stopPropagation()
+        try {
+            await navigator.clipboard.writeText(filename)
+            setToast({ message: '已复制文件名', type: 'success' })
+            console.log('Copied filename:', filename)
+        } catch (err) {
+            setToast({ message: '复制失败', type: 'error' })
+            console.error('Failed to copy filename:', err)
         }
-        setContextMenu(null)
     }
 
     // Close context menu on click outside
@@ -239,6 +241,16 @@ const StarredFiles = () => {
                             />
                         )}
                         <span className="file-name">{node.name}</span>
+                        <button
+                            className="copy-btn"
+                            onClick={(e) => handleCopyFilename(e, node.name)}
+                            title="复制文件名"
+                        >
+                            <svg viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
+                                <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+                            </svg>
+                        </button>
                     </div>
                     {node.isDirectory && isExpanded && children && (
                         <div>{renderFileTree(children, depth + 1)}</div>
@@ -308,6 +320,16 @@ const StarredFiles = () => {
                                     )}
                                     <span className="file-name">{item.name}</span>
                                     <button
+                                        className="copy-btn"
+                                        onClick={(e) => handleCopyFilename(e, item.name)}
+                                        title="复制文件名"
+                                    >
+                                        <svg viewBox="0 0 16 16" fill="currentColor">
+                                            <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
+                                            <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+                                        </svg>
+                                    </button>
+                                    <button
                                         className="remove-btn"
                                         onClick={(e) => handleRemove(e, item.id)}
                                         title="取消星标"
@@ -327,25 +349,13 @@ const StarredFiles = () => {
                     })}
             </div>
 
-            {/* Context Menu */}
-            {contextMenu && (
-                <div
-                    className="context-menu"
-                    style={{
-                        position: 'fixed',
-                        left: `${contextMenu.x}px`,
-                        top: `${contextMenu.y}px`,
-                        zIndex: 1000
-                    }}
-                >
-                    <div className="context-menu-item" onClick={handleCopyFilename}>
-                        <svg viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
-                            <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
-                        </svg>
-                        复制文件名
-                    </div>
-                </div>
+            {/* Toast */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
         </div>
     )

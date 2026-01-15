@@ -16,6 +16,7 @@ const Terminal = () => {
     const activeSessionId = useAppStore((state) => state.activeSessionId)
     const sessions = useAppStore((state) => state.sessions)
     const workspaceChangeCounter = useAppStore((state) => state.workspaceChangeCounter)
+    const updateTerminalActivity = useAppStore((state) => state.updateTerminalActivity)
 
     // Get active session and its active terminal
     const activeSession = sessions.find(s => s.id === activeSessionId)
@@ -28,6 +29,13 @@ const Terminal = () => {
             const terminalInstance = terminalsRef.current.get(terminalId)
             if (terminalInstance) {
                 terminalInstance.xterm.write(data)
+                // Update terminal activity
+                updateTerminalActivity(terminalId, true)
+
+                // Mark as inactive after a short delay
+                setTimeout(() => {
+                    updateTerminalActivity(terminalId, false)
+                }, 500)
             }
         })
 

@@ -13,9 +13,17 @@ const api = {
     readDir: (dirPath: string) => ipcRenderer.invoke('fs:readDir', dirPath),
     readFile: (filePath: string) => ipcRenderer.invoke('fs:readFile', filePath),
     writeFile: (filePath: string, content: string) => ipcRenderer.invoke('fs:writeFile', filePath, content),
-    onFileChanged: (callback: (event: string, path: string) => void) => {
-      const handler = (_: any, payload: { event: string; path: string }) => {
-        callback(payload.event, payload.path)
+    onFileChanged: (callback: (data: {
+      event: string;
+      path: string;
+      timestamp?: number
+    }) => void) => {
+      const handler = (_: any, payload: {
+        event: string;
+        path: string;
+        timestamp?: number
+      }) => {
+        callback(payload)
       }
       ipcRenderer.on('file:changed', handler)
 

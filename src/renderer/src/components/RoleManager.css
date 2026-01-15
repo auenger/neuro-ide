@@ -4,58 +4,80 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--cc-bg-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(8px);
+    animation: fade-in 0.2s ease-out;
 }
 
 .role-manager-modal {
-    background: #1e1e1e;
-    width: 800px;
-    height: 600px;
-    border-radius: 8px;
-    border: 1px solid #3e3e3e;
+    background: var(--cc-bg-secondary);
+    width: 850px;
+    height: 650px;
+    border-radius: 4px;
+    border: 1px solid var(--cc-border-secondary);
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+
+    animation: slide-in-right 0.3s ease-out;
 }
 
 .modal-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid #3e3e3e;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--cc-border-primary);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: var(--cc-bg-tertiary);
+    position: relative;
+}
+
+.modal-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            var(--cc-accent-primary) 50%,
+            transparent 100%);
+    opacity: 0.3;
 }
 
 .modal-header h3 {
     margin: 0;
-    color: #e0e0e0;
-    font-size: 16px;
-    font-weight: 600;
+    color: var(--cc-accent-primary);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-family: var(--font-display);
+
 }
 
 .close-btn {
     background: transparent;
     border: none;
-    color: #858585;
+    color: var(--cc-text-tertiary);
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.2s;
+    padding: 6px;
+    border-radius: 2px;
+    transition: all var(--transition-base);
 }
 
 .close-btn:hover {
-    background: #2d2d2d;
-    color: #ffffff;
+    background: var(--cc-bg-elevated);
+    color: var(--cc-error);
 }
 
 .close-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
 .modal-content {
@@ -65,31 +87,42 @@
 }
 
 .role-list-sidebar {
-    width: 200px;
-    border-right: 1px solid #3e3e3e;
+    width: 220px;
+    border-right: 1px solid var(--cc-border-primary);
     display: flex;
     flex-direction: column;
-    background: #252526;
+    background: var(--cc-bg-tertiary);
 }
 
 .add-role-btn {
-    margin: 12px;
-    padding: 8px;
-    background: #0e639c;
-    color: white;
+    margin: 14px;
+    padding: 10px 14px;
+    background: var(--cc-accent-primary);
+    color: var(--cc-bg-primary);
     border: none;
-    border-radius: 4px;
+    border-radius: 2px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    font-size: 13px;
-    transition: background 0.2s;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-family: var(--font-mono);
+    transition: all var(--transition-base);
+
 }
 
 .add-role-btn:hover {
-    background: #1177bb;
+    background: var(--cc-accent-secondary);
+
+    transform: translateY(-1px);
+}
+
+.add-role-btn:active {
+    transform: translateY(0);
 }
 
 .add-role-btn svg {
@@ -100,73 +133,89 @@
 .role-list-items {
     flex: 1;
     overflow-y: auto;
-    padding: 0 8px 12px;
+    padding: 0 10px 14px;
 }
 
 .role-list-item {
-    padding: 8px 12px;
-    border-radius: 4px;
+    padding: 10px 14px;
+    border-radius: 2px;
     cursor: pointer;
-    color: #cccccc;
+    color: var(--cc-text-secondary);
     font-size: 13px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2px;
+    transition: all var(--transition-base);
+    border-left: 2px solid transparent;
+    font-family: var(--font-mono);
 }
 
 .role-list-item:hover {
-    background: #2a2d2e;
+    background: var(--cc-bg-elevated);
+    color: var(--cc-text-primary);
+    border-left-color: var(--cc-accent-secondary);
 }
 
 .role-list-item.active {
-    background: #37373d;
-    color: white;
+    background: var(--cc-bg-elevated);
+    color: var(--cc-accent-primary);
+    border-left-color: var(--cc-accent-primary);
+
 }
 
 .builtin-badge {
-    font-size: 10px;
-    background: #3e3e3e;
-    padding: 2px 6px;
-    border-radius: 10px;
-    color: #aaaaaa;
+    font-size: 9px;
+    background: var(--cc-bg-elevated);
+    padding: 3px 8px;
+    border-radius: 2px;
+    color: var(--cc-text-muted);
+    border: 1px solid var(--cc-border-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
 }
 
 .role-editor {
     flex: 1;
-    padding: 24px;
+    padding: 28px;
     overflow-y: auto;
-    background: #1e1e1e;
+    background: var(--cc-bg-secondary);
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .form-group label {
     display: block;
-    color: #858585;
-    font-size: 12px;
-    margin-bottom: 6px;
-    font-weight: 500;
+    color: var(--cc-text-secondary);
+    font-size: 11px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--font-display);
 }
 
 .form-group input,
 .form-group textarea {
     width: 100%;
-    background: #3c3c3c;
-    border: 1px solid #3c3c3c;
-    color: #cccccc;
-    padding: 8px;
-    border-radius: 4px;
+    background: var(--cc-bg-elevated);
+    border: 1px solid var(--cc-border-secondary);
+    color: var(--cc-text-primary);
+    padding: 10px 12px;
+    border-radius: 2px;
     font-size: 13px;
-    font-family: inherit;
+    font-family: var(--font-mono);
+    transition: all var(--transition-base);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #0e639c;
+    border-color: var(--cc-accent-primary);
+
 }
 
 .form-group.full-height {
@@ -176,48 +225,50 @@
 }
 
 .form-group textarea {
-    min-height: 200px;
+    min-height: 220px;
     resize: vertical;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 .icon-selector {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
 .icon-option {
-    width: 36px;
-    height: 36px;
-    background: #2d2d2d;
-    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    background: var(--cc-bg-elevated);
+    border-radius: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border: 1px solid transparent;
-    border: 1px solid transparent;
-    transition: all 0.2s;
-    color: #cccccc;
+    border: 1px solid var(--cc-border-secondary);
+    transition: all var(--transition-base);
+    color: var(--cc-text-tertiary);
 }
 
 .icon-option:hover {
-    background: #3e3e3e;
+    background: var(--cc-bg-tertiary);
+    border-color: var(--cc-accent-secondary);
+    color: var(--cc-accent-secondary);
 }
 
 .icon-option.selected {
-    background: #094771;
-    border-color: #0078d4;
-    color: white;
+    background: var(--cc-bg-elevated);
+    border-color: var(--cc-accent-primary);
+    color: var(--cc-accent-primary);
+
 }
 
 .icon-preview {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
 }
 
 .icon-preview svg {
@@ -229,40 +280,57 @@
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid #2d2d2d;
+    gap: 14px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--cc-border-primary);
 }
 
 .save-btn {
-    padding: 8px 24px;
-    background: #0e639c;
-    color: white;
+    padding: 10px 28px;
+    background: var(--cc-accent-primary);
+    color: var(--cc-bg-primary);
     border: none;
-    border-radius: 4px;
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 13px;
-    transition: background 0.2s;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-family: var(--font-mono);
+    transition: all var(--transition-base);
+
 }
 
 .save-btn:hover {
-    background: #1177bb;
+    background: var(--cc-accent-secondary);
+
+    transform: translateY(-1px);
+}
+
+.save-btn:active {
+    transform: translateY(0);
 }
 
 .delete-btn {
-    padding: 8px 16px;
+    padding: 10px 20px;
     background: transparent;
-    color: #e51400;
-    border: 1px solid #e51400;
-    border-radius: 4px;
+    color: var(--cc-error);
+    border: 1px solid var(--cc-error);
+    border-radius: 2px;
     cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-family: var(--font-mono);
+    transition: all var(--transition-base);
 }
 
 .delete-btn:hover {
-    background: rgba(229, 20, 0, 0.1);
+    background: var(--cc-error);
+    color: var(--cc-bg-primary);
+
 }
 
 .empty-state {
@@ -270,49 +338,51 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-
-    color: #666;
+    color: var(--cc-text-muted);
     font-style: italic;
+    font-family: var(--font-mono);
 }
 
 /* Toggle Switch */
 .toggle-switch-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     cursor: pointer;
-    color: #cccccc;
+    color: var(--cc-text-primary);
     font-size: 13px;
     user-select: none;
+    font-family: var(--font-mono);
 }
 
 .toggle-switch {
-    width: 36px;
-    height: 20px;
-    background-color: #3c3c3c;
-    border-radius: 10px;
+    width: 40px;
+    height: 22px;
+    background-color: var(--cc-bg-elevated);
+    border-radius: 11px;
     position: relative;
-    transition: background-color 0.2s;
-    border: 1px solid #454545;
+    transition: all var(--transition-base);
+    border: 1px solid var(--cc-border-secondary);
 }
 
 .toggle-switch.checked {
-    background-color: #0e639c;
-    border-color: #0e639c;
+    background-color: var(--cc-accent-primary);
+    border-color: var(--cc-accent-primary);
+
 }
 
 .toggle-knob {
-    width: 14px;
-    height: 14px;
-    background-color: #ffffff;
+    width: 16px;
+    height: 16px;
+    background-color: var(--cc-text-primary);
     border-radius: 50%;
     position: absolute;
     top: 2px;
     left: 2px;
-    transition: transform 0.2s;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: transform var(--transition-base);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .toggle-switch.checked .toggle-knob {
-    transform: translateX(16px);
+    transform: translateX(18px);
 }

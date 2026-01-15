@@ -63,11 +63,35 @@ const MarkdownEditor = ({ isCollapsed, onToggleCollapse }: { isCollapsed?: boole
         }
     }
 
+    const handleInit = async () => {
+        try {
+            // 构造完整的初始化字符串
+            const initText = `先加载设定，等待用户下一次指令\n${markdown}`
+
+            // 复制到剪贴板
+            await navigator.clipboard.writeText(initText)
+
+            // 获取活跃的终端 ID
+            const activeTerminalId = activeSession?.activeTerminalId
+
+            if (activeTerminalId) {
+                // 发送到终端并自动回车
+                window.api.session.input(activeTerminalId, initText + '\r')
+                setToast({ message: '已初始化并发送到终端', type: 'success' })
+            } else {
+                setToast({ message: '已复制，但未找到活跃终端', type: 'warning' })
+            }
+        } catch (err) {
+            console.error('Failed to init:', err)
+            setToast({ message: '初始化失败', type: 'warning' })
+        }
+    }
+
     return (
         <div className="markdown-editor">
             <div className="editor-header">
-                <div className="editor-title">
-                    <h4>MD</h4>
+                <div className="editor-title stage-title">
+                    <h4>ROLE</h4>
                     {activeSession && (
                         <span className="role-badge">{activeSession.name}</span>
                     )}
@@ -118,6 +142,15 @@ const MarkdownEditor = ({ isCollapsed, onToggleCollapse }: { isCollapsed?: boole
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                        <button
+                            className="btn-icon"
+                            onClick={handleInit}
+                            title="初始化：发送到终端"
+                        >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                             </svg>
                         </button>
                         <button

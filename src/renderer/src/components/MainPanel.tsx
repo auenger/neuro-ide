@@ -99,7 +99,7 @@ const MainPanel = () => {
                 <Panel defaultSize={isMdCollapsed ? 95 : 40} minSize={20}>
                     <div className="chat-console">
                         <div className="chat-header">
-                            <div className="header-left">
+                            <div className="header-left stage-title">
                                 <h4>对话控制台</h4>
                             </div>
                             <div className="terminal-controls">

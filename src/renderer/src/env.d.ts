@@ -31,7 +31,7 @@ interface Window {
             readDir: (dirPath: string) => Promise<FileEntry[]>
             readFile: (filePath: string) => Promise<{ success: boolean; content: string | null }>
             writeFile: (filePath: string, content: string) => Promise<{ success: boolean }>
-            onFileChanged: (callback: (event: string, path: string) => void) => () => void
+            onFileChanged: (callback: (data: { event: string; path: string; timestamp?: number }) => void) => () => void
             searchInWorkspace: (workspacePath: string, query: string) => Promise<Array<{
                 file: string
                 path: string

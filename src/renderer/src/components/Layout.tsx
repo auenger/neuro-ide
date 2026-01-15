@@ -2,6 +2,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import Sidebar from './Sidebar'
 import MainPanel from './MainPanel'
 import StagePanel from './StagePanel'
+import TerminalActivityMonitor from './TerminalActivityMonitor'
 import './Layout.css'
 
 const Layout = () => {
@@ -43,6 +44,9 @@ const Layout = () => {
                     <StagePanel />
                 </Panel>
             </PanelGroup>
+
+            {/* Terminal Activity Monitor - Floating notifications */}
+            <TerminalActivityMonitor />
         </div>
     )
 }

@@ -200,7 +200,11 @@ class FileWatcher {
 
   private notify(event: string, path: string): void {
     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-      this.mainWindow.webContents.send('file:changed', { event, path })
+      this.mainWindow.webContents.send('file:changed', {
+        event,
+        path,
+        timestamp: Date.now()
+      })
       console.log(`File ${event}:`, path)
     }
   }
