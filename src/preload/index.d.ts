@@ -10,6 +10,9 @@ export interface API {
   workspace: {
     select: () => Promise<{ success: boolean; path: string | null }>
   }
+  dialog: {
+    openDirectory: () => Promise<{ canceled: boolean; filePaths: string[] }>
+  }
   fs: {
     readDir: (dirPath: string) => Promise<any[]>
     readFile: (filePath: string) => Promise<{ success: boolean; content: string | null }>
@@ -35,7 +38,17 @@ export interface API {
 
 declare global {
   interface Window {
-    electron: ElectronAPI & { process: any }
+    electron: ElectronAPI & {
+      process: any
+      ipcRenderer: {
+        send(channel: string, ...args: any[]): void
+        on(channel: string, func: (...args: any[]) => void): () => void
+        once(channel: string, func: (...args: any[]) => void): void
+        removeListener(channel: string, func: (...args: any[]) => void): void
+        removeAllListeners(channel: string): void
+        invoke(channel: string, ...args: any[]): Promise<any>
+      }
+    }
     api: API
   }
 }

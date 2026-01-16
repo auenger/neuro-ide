@@ -7,6 +7,8 @@ import os from 'os'
 import chokidar from 'chokidar'
 import fs from 'fs/promises'
 import { ConfigManager } from './config'
+import { RecentWorkspacesManager } from './recentWorkspaces'
+import { WorkspacePickerWindow } from './workspacePicker'
 
 // Session Manager
 class SessionManager {
@@ -267,8 +269,67 @@ function createWindow(): BrowserWindow {
   return mainWindow
 }
 
+// Global references
+let mainWindow: BrowserWindow | null = null
+const sessionManager = new SessionManager()
+const fileWatcher = new FileWatcher()
+const homeDir = process.env.HOME || process.env.USERPROFILE || ''
+const tempConfigManager = new ConfigManager(homeDir)
+const recentWorkspacesManager = new RecentWorkspacesManager(tempConfigManager)
+
+// Initialize workspace manager
+async function initializeApp(): Promise<void> {
+  await recentWorkspacesManager.initialize()
+
+  // Set up callback for when a workspace is selected from the recent list
+  recentWorkspacesManager.setWorkspaceSelectedCallback((workspacePath) => {
+    console.log('[Workspace] Selected from menu:', workspacePath)
+
+    // Check if window exists and is valid
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      console.log('[Workspace] Creating new window')
+      mainWindow = createWindow()
+      fileWatcher.setMainWindow(mainWindow)
+
+      // Wait for window to be ready before applying workspace
+      mainWindow.webContents.once('did-finish-load', () => {
+        console.log('[Workspace] Window ready, applying workspace')
+        applyWorkspace(workspacePath)
+      })
+    } else {
+      console.log('[Workspace] Using existing window')
+      // Window already exists, apply immediately
+      applyWorkspace(workspacePath)
+    }
+  })
+}
+
+// Apply workspace settings
+function applyWorkspace(workspacePath: string): void {
+  console.log('[Workspace] Applying workspace:', workspacePath)
+
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    console.warn('[Workspace] Cannot apply workspace: window is destroyed')
+    return
+  }
+
+  console.log('[Workspace] Setting working directory')
+  sessionManager.setWorkingDirectory(workspacePath)
+
+  console.log('[Workspace] Starting file watcher')
+  fileWatcher.watch(workspacePath)
+
+  console.log('[Workspace] Saving current workspace config')
+  tempConfigManager.saveConfig('current-workspace.json', { path: workspacePath }, 'global')
+
+  console.log('[Workspace] Sending workspace:opened event to renderer')
+  mainWindow.webContents.send('workspace:opened', { path: workspacePath })
+
+  console.log('[Workspace] Workspace applied successfully')
+}
+
 // This method will be called when Electron has finished initialization
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   electronApp.setAppUserModelId('com.electron')
 
   app.on('browser-window-created', (_, window) => {
@@ -277,14 +338,15 @@ app.whenReady().then(() => {
 
   ipcMain.on('ping', () => console.log('pong'))
 
-  const mainWindow = createWindow()
-  const sessionManager = new SessionManager()
-  const fileWatcher = new FileWatcher()
+  // Initialize app
+  await initializeApp()
+
+  mainWindow = createWindow()
   fileWatcher.setMainWindow(mainWindow)
 
   // Workspace IPC handlers
   ipcMain.handle('workspace:select', async () => {
-    const result = await dialog.showOpenDialog(mainWindow, {
+    const result = await dialog.showOpenDialog(mainWindow!, {
       properties: ['openDirectory']
     })
 
@@ -292,10 +354,22 @@ app.whenReady().then(() => {
       const workspacePath = result.filePaths[0]
       sessionManager.setWorkingDirectory(workspacePath)
       fileWatcher.watch(workspacePath)
+      // Add to recent workspaces
+      await recentWorkspacesManager.addWorkspace(workspacePath)
+      // Save current workspace
+      await tempConfigManager.saveConfig('current-workspace.json', { path: workspacePath }, 'global')
       return { success: true, path: workspacePath }
     }
 
     return { success: false, path: null }
+  })
+
+  // Dialog IPC handler for workspace picker
+  ipcMain.handle('dialog:openDirectory', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory']
+    })
+    return result
   })
 
   // File system IPC handlers
@@ -432,7 +506,7 @@ app.whenReady().then(() => {
 
   // Session IPC handlers
   ipcMain.handle('session:create', (_, sessionId: string, customPrompt?: string) => {
-    const pid = sessionManager.createSession(sessionId, mainWindow, customPrompt)
+    const pid = sessionManager.createSession(sessionId, mainWindow!, customPrompt)
     return { success: pid !== null, pid }
   })
 
@@ -454,9 +528,67 @@ app.whenReady().then(() => {
     fileWatcher.close()
   })
 
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  app.on('activate', async function () {
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (BrowserWindow.getAllWindows().length === 0) {
+      mainWindow = createWindow()
+      fileWatcher.setMainWindow(mainWindow)
+
+      // Try to restore last workspace
+      const lastWorkspace = await tempConfigManager.loadConfig<{ path: string }>(
+        'current-workspace.json',
+        { path: '' },
+        'global'
+      )
+
+      if (lastWorkspace.path && lastWorkspace.path !== homeDir) {
+        // Wait for window to be ready
+        mainWindow.once('ready-to-show', () => {
+          applyWorkspace(lastWorkspace.path)
+        })
+      }
+    }
   })
+
+  // Handle command line arguments (for Windows Jump List / macOS Dock menu)
+  const workspaceFromArgs = recentWorkspacesManager.handleCommandLine(process.argv)
+  if (workspaceFromArgs) {
+    sessionManager.setWorkingDirectory(workspaceFromArgs)
+    fileWatcher.watch(workspaceFromArgs)
+    await tempConfigManager.saveConfig('current-workspace.json', { path: workspaceFromArgs }, 'global')
+    mainWindow.webContents.send('workspace:opened', { path: workspaceFromArgs })
+  } else {
+    // Try to load last workspace
+    const lastWorkspace = await tempConfigManager.loadConfig<{ path: string }>(
+      'current-workspace.json',
+      { path: '' },
+      'global'
+    )
+
+    if (lastWorkspace.path && lastWorkspace.path !== homeDir) {
+      // Restore last workspace
+      sessionManager.setWorkingDirectory(lastWorkspace.path)
+      fileWatcher.watch(lastWorkspace.path)
+      mainWindow.webContents.send('workspace:opened', { path: lastWorkspace.path })
+    } else {
+      // Show workspace picker after main window is ready
+      mainWindow.webContents.once('did-finish-load', async () => {
+        const picker = new WorkspacePickerWindow()
+        const recentWorkspaces = recentWorkspacesManager.getRecentWorkspaces()
+        console.log('Showing workspace picker with recent workspaces:', recentWorkspaces)
+        const selectedWorkspace = await picker.show(recentWorkspaces)
+
+        if (selectedWorkspace) {
+          sessionManager.setWorkingDirectory(selectedWorkspace)
+          fileWatcher.watch(selectedWorkspace)
+          await recentWorkspacesManager.addWorkspace(selectedWorkspace)
+          await tempConfigManager.saveConfig('current-workspace.json', { path: selectedWorkspace }, 'global')
+          mainWindow!.webContents.send('workspace:opened', { path: selectedWorkspace })
+        }
+      })
+    }
+  }
 })
 
 app.on('window-all-closed', () => {

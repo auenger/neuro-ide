@@ -357,9 +357,31 @@ export const useAppStore = create<AppState>((set, get) => ({
         const newRoles = state.roles.map(role =>
             role.id === id ? { ...role, ...updates } : role
         )
-        const newSessions = state.sessions.map(session =>
-            session.id === id ? { ...session, ...updates } : session
-        )
+
+        // Rebuild sessions based on active status
+        // If a role becomes inactive, remove it from sessions
+        // If a role becomes active, add it to sessions
+        const updatedRole = newRoles.find(r => r.id === id)
+        let newSessions = [...state.sessions]
+
+        if (updatedRole) {
+            if (updatedRole.isActive) {
+                // Role is active - update if exists, add if doesn't
+                const sessionExists = newSessions.some(s => s.id === id)
+                if (sessionExists) {
+                    // Update existing session
+                    newSessions = newSessions.map(session =>
+                        session.id === id ? { ...session, ...updates } : session
+                    )
+                } else {
+                    // Add new session for newly activated role
+                    newSessions.push(createSession(updatedRole))
+                }
+            } else {
+                // Role is inactive - remove from sessions
+                newSessions = newSessions.filter(s => s.id !== id)
+            }
+        }
 
         if (state.workspacePath && window.api?.config) {
             // Save roles globally
@@ -380,9 +402,16 @@ export const useAppStore = create<AppState>((set, get) => ({
             })
         }
 
+        // If the active session was removed, switch to first available session
+        const activeSessionStillExists = newSessions.some(s => s.id === state.activeSessionId)
+        const newActiveSessionId = activeSessionStillExists
+            ? state.activeSessionId
+            : (newSessions.length > 0 ? newSessions[0].id : 'architect')
+
         return {
             roles: newRoles,
-            sessions: newSessions
+            sessions: newSessions,
+            activeSessionId: newActiveSessionId
         }
     }),
 

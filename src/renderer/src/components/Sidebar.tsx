@@ -305,6 +305,22 @@ const Sidebar = () => {
         return removeListener
     }, [workspacePath, addFileChange])
 
+    // Listen for workspace opened event (from dock menu / jump list)
+    useEffect(() => {
+        const handleWorkspaceOpened = (_event: any, data: { path: string }) => {
+            console.log('[Renderer] Workspace opened event received:', data.path)
+            setWorkspacePath(data.path)
+            loadDirectory(data.path)
+            incrementWorkspaceChangeCounter()
+        }
+
+        window.electron.ipcRenderer.on('workspace:opened', handleWorkspaceOpened)
+
+        return () => {
+            window.electron.ipcRenderer.removeListener('workspace:opened', handleWorkspaceOpened)
+        }
+    }, [])
+
 
 
     return (

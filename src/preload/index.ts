@@ -8,6 +8,11 @@ const api = {
     select: () => ipcRenderer.invoke('workspace:select')
   },
 
+  // Dialog operations
+  dialog: {
+    openDirectory: () => ipcRenderer.invoke('dialog:openDirectory')
+  },
+
   // File system operations
   fs: {
     readDir: (dirPath: string) => ipcRenderer.invoke('fs:readDir', dirPath),

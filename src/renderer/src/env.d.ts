@@ -21,6 +21,9 @@ interface Window {
         workspace: {
             select: () => Promise<{ success: boolean; path: string | null }>
         }
+        dialog: {
+            openDirectory: () => Promise<{ canceled: boolean; filePaths: string[] }>
+        }
         config: {
             load: <T>(params: { workspacePath: string; filename: string; defaultValue: T }) => Promise<T>
             save: <T>(params: { workspacePath: string; filename: string; data: T }) => Promise<boolean>

@@ -39,6 +39,12 @@ Last Updated: Jan 2026
 
 #### 3. The Workspace (File & Project Management)
 - **Workspace Management**: Open and switch local directories, with automatic terminal session migration.
+- **Recent Workspaces**: 
+  - Quick access to recently opened workspaces via macOS Dock menu or Windows Jump List
+  - Displays up to 8 most recent workspaces with folder icons
+  - Persistent across application restarts
+  - Automatic workspace restoration on app launch
+  - Initial workspace selection prompt for first-time users
 - **Recursive File Tree**: Infinite nesting, automatic sorting, and real-time file watching via `chokidar`.
 - **Global Search**: Deep file search capability with filename prioritization, powered by recursive backend search.
 - **Monaco Editor Support**: Full-featured code editing (VS Code engine) with syntax highlighting for major languages.
