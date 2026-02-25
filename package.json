@@ -21,10 +21,14 @@
     "build:linux": "electron-vite build && electron-builder --linux"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@iconify/react": "^6.0.2",
     "@monaco-editor/react": "^4.7.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "chokidar": "^5.0.0",
     "clsx": "^2.1.1",
     "devicon": "^2.17.0",
@@ -36,6 +40,7 @@
     "node-pty": "^1.1.0",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^3.0.0",
+    "react-syntax-highlighter": "^16.1.0",
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.0",
     "vscode-icons-js": "^11.6.1",

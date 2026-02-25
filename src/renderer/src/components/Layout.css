@@ -49,3 +49,43 @@
   color: var(--cc-text-primary);
   border-right: 1px solid var(--cc-border-primary);
 }
+
+/* Stage Panel Toggle Button - Middle Right Edge */
+.stage-toggle-btn {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 48px;
+  background: var(--cc-bg-tertiary);
+  border: none;
+  border-left: 1px solid var(--cc-border-primary);
+  border-radius: 6px 0 0 6px;
+  color: var(--cc-text-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  z-index: 100;
+}
+
+.stage-toggle-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.stage-toggle-btn:hover {
+  background: var(--cc-bg-elevated);
+  color: var(--cc-accent-primary);
+  width: 24px;
+}
+
+.stage-toggle-btn.active {
+  color: var(--cc-accent-primary);
+}
+
+.stage-toggle-btn.active:hover {
+  color: var(--cc-text-primary);
+}

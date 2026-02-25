@@ -14,7 +14,9 @@ const ChangedFiles = () => {
         setOriginalFileContent,
         setEditorMode,
         addStarredItem,
-        starredItems
+        starredItems,
+        stagePanelVisible,
+        setStagePanelVisible
     } = useAppStore()
 
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'warning' | 'error' } | null>(null)
@@ -35,6 +37,9 @@ const ChangedFiles = () => {
                 setCurrentFileContent(result.content)
                 setOriginalFileContent(result.content)
                 setEditorMode('editor')
+                if (!stagePanelVisible) {
+                    setStagePanelVisible(true)
+                }
             } else {
                 setToast({ message: '无法读取文件', type: 'error' })
             }

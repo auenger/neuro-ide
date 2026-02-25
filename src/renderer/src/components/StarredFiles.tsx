@@ -20,7 +20,10 @@ const StarredFiles = () => {
         setCurrentFile,
         setCurrentFileContent,
         setOriginalFileContent,
-        setEditorMode
+        setEditorMode,
+        stagePanelVisible,
+        setStagePanelVisible,
+        fileChanges
     } = useAppStore()
 
     const [draggedItem, setDraggedItem] = useState<string | null>(null)
@@ -33,28 +36,29 @@ const StarredFiles = () => {
     } | null>(null)
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'warning' | 'error' } | null>(null)
 
+    // Helper function to load folder contents
+    const loadFolderContents = async (path: string): Promise<FileNode[]> => {
+        const result = await window.api.fs.readDir(path)
+        const nodes: FileNode[] = result
+            .filter(file => !file.name.startsWith('.'))
+            .map(file => ({
+                name: file.name,
+                path: file.path,
+                isDirectory: file.isDirectory,
+                children: file.isDirectory ? [] : undefined,
+                isExpanded: false
+            }))
+        // Sort: directories first, then files
+        nodes.sort((a, b) => {
+            if (a.isDirectory && !b.isDirectory) return -1
+            if (!a.isDirectory && b.isDirectory) return 1
+            return a.name.localeCompare(b.name)
+        })
+        return nodes
+    }
+
     // Load folder contents when starred
     useEffect(() => {
-        const loadFolderContents = async (path: string) => {
-            const result = await window.api.fs.readDir(path)
-            const nodes: FileNode[] = result
-                .filter(file => !file.name.startsWith('.'))
-                .map(file => ({
-                    name: file.name,
-                    path: file.path,
-                    isDirectory: file.isDirectory,
-                    children: file.isDirectory ? [] : undefined,
-                    isExpanded: false
-                }))
-            // Sort: directories first, then files
-            nodes.sort((a, b) => {
-                if (a.isDirectory && !b.isDirectory) return -1
-                if (!a.isDirectory && b.isDirectory) return 1
-                return a.name.localeCompare(b.name)
-            })
-            return nodes
-        }
-
         // Load contents for all starred folders
         starredItems.forEach(async (item) => {
             if (item.isDirectory && !expandedFolders.has(item.path)) {
@@ -62,27 +66,46 @@ const StarredFiles = () => {
                 setExpandedFolders(prev => new Map(prev).set(item.path, children))
             }
         })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [starredItems])
+
+    // Refresh starred folder contents when files change within them
+    useEffect(() => {
+        const refreshAffectedFolders = async () => {
+            // Get all expanded starred folders
+            const expandedStarredFolders = starredItems.filter(
+                item => item.isDirectory && expandedFolders.has(item.path)
+            )
+
+            // Check each file change
+            for (const [changedPath] of fileChanges) {
+                // Find which expanded folder this changed file belongs to
+                for (const folder of expandedStarredFolders) {
+                    // Check if changed path is inside this folder
+                    if (changedPath.startsWith(folder.path + '/') || changedPath.startsWith(folder.path + '\\')) {
+                        // Refresh this folder's content
+                        const children = await loadFolderContents(folder.path)
+                        setExpandedFolders(prev => {
+                            const newMap = new Map(prev)
+                            newMap.set(folder.path, children)
+                            return newMap
+                        })
+                        break // Only refresh once per changed file
+                    }
+                }
+            }
+        }
+
+        if (fileChanges.size > 0) {
+            refreshAffectedFolders()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fileChanges])
 
     const toggleFolder = async (path: string, currentChildren?: FileNode[]) => {
         if (!currentChildren) {
             // Load children if not loaded
-            const result = await window.api.fs.readDir(path)
-            const nodes: FileNode[] = result
-                .filter(file => !file.name.startsWith('.'))
-                .map(file => ({
-                    name: file.name,
-                    path: file.path,
-                    isDirectory: file.isDirectory,
-                    children: file.isDirectory ? [] : undefined,
-                    isExpanded: false
-                }))
-            nodes.sort((a, b) => {
-                if (a.isDirectory && !b.isDirectory) return -1
-                if (!a.isDirectory && b.isDirectory) return 1
-                return a.name.localeCompare(b.name)
-            })
-
+            const nodes = await loadFolderContents(path)
             setExpandedFolders(prev => {
                 const newMap = new Map(prev)
                 newMap.set(path, nodes)
@@ -161,6 +184,9 @@ const StarredFiles = () => {
                 setCurrentFileContent(result.content)
                 setOriginalFileContent(result.content)
                 setEditorMode('editor')
+                if (!stagePanelVisible) {
+                    setStagePanelVisible(true)
+                }
             }
         }
     }

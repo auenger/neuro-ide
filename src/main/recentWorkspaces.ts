@@ -13,6 +13,7 @@ export class RecentWorkspacesManager {
     private configManager: ConfigManager
     private recentWorkspaces: string[] = []
     private onWorkspaceSelected?: (workspacePath: string) => void
+    private updateMenuTimer?: NodeJS.Timeout
 
     constructor(configManager: ConfigManager) {
         this.configManager = configManager
@@ -123,14 +124,22 @@ export class RecentWorkspacesManager {
     }
 
     /**
-     * 更新应用图标右键菜单
+     * 更新应用图标右键菜单（带防抖）
      */
     updateAppMenu(): void {
-        if (process.platform === 'darwin') {
-            this.updateMacDockMenu()
-        } else if (process.platform === 'win32') {
-            this.updateWindowsJumpList()
+        // 清除之前的定时器
+        if (this.updateMenuTimer) {
+            clearTimeout(this.updateMenuTimer)
         }
+
+        // 防抖：延迟执行，避免频繁更新
+        this.updateMenuTimer = setTimeout(() => {
+            if (process.platform === 'darwin') {
+                this.updateMacDockMenu()
+            } else if (process.platform === 'win32') {
+                this.updateWindowsJumpList()
+            }
+        }, 100)
     }
 
     /**

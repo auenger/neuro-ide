@@ -9,6 +9,7 @@ import fs from 'fs/promises'
 import { ConfigManager } from './config'
 import { RecentWorkspacesManager } from './recentWorkspaces'
 import { WorkspacePickerWindow } from './workspacePicker'
+import { claudeHistoryService } from './claudeHistory'
 
 // Session Manager
 class SessionManager {
@@ -161,15 +162,27 @@ class SessionManager {
 class FileWatcher {
   private watcher: ReturnType<typeof chokidar.watch> | null = null
   private mainWindow: BrowserWindow | null = null
+  private currentDirectory: string | null = null
+  private ignoredDirectories: string[] = []
 
   setMainWindow(window: BrowserWindow): void {
     this.mainWindow = window
+  }
+
+  setIgnoredDirectories(dirs: string[]): void {
+    this.ignoredDirectories = dirs
+    // Re-watch with new settings if currently watching
+    if (this.currentDirectory) {
+      this.watch(this.currentDirectory)
+    }
   }
 
   watch(directory: string): void {
     if (this.watcher) {
       this.watcher.close()
     }
+
+    this.currentDirectory = directory
 
     this.watcher = chokidar.watch(directory, {
       ignored: (path) => {
@@ -180,9 +193,17 @@ class FileWatcher {
         if (path.includes(directory + '/out')) return true
         if (path.includes(directory + '/build')) return true
 
-        // Check for hidden files/folders (starting with .) but allow .neuro
+        // Check for hidden files/folders (starting with .)
         const basename = path.split(/[/\\]/).pop() || ''
-        if (basename.startsWith('.') && basename !== '.neuro') return true
+        if (basename.startsWith('.')) return true
+
+        // Check user-defined ignored directories (relative paths)
+        for (const ignoredDir of this.ignoredDirectories) {
+          // ignoredDir is now a relative path like "src/out" or just "out"
+          if (path.includes(directory + '/' + ignoredDir)) {
+            return true
+          }
+        }
 
         return false
       },
@@ -197,7 +218,7 @@ class FileWatcher {
       .on('unlink', (path) => this.notify('unlink', path))
       .on('error', (error) => console.error('FileWatcher error:', error))
 
-    console.log('Watching directory:', directory)
+    console.log('Watching directory:', directory, 'with ignored dirs:', this.ignoredDirectories)
   }
 
   private notify(event: string, path: string): void {
@@ -343,6 +364,8 @@ app.whenReady().then(async () => {
 
   mainWindow = createWindow()
   fileWatcher.setMainWindow(mainWindow)
+  claudeHistoryService.setMainWindow(mainWindow)
+  claudeHistoryService.startWatching()
 
   // Workspace IPC handlers
   ipcMain.handle('workspace:select', async () => {
@@ -504,6 +527,11 @@ app.whenReady().then(async () => {
     return configManager.saveRoleSettings(data)
   })
 
+  // Update ignored directories for file watcher
+  ipcMain.on('fileWatcher:setIgnoredDirectories', (_, { ignoredDirectories }: { ignoredDirectories: string[] }) => {
+    fileWatcher.setIgnoredDirectories(ignoredDirectories)
+  })
+
   // Session IPC handlers
   ipcMain.handle('session:create', (_, sessionId: string, customPrompt?: string) => {
     const pid = sessionManager.createSession(sessionId, mainWindow!, customPrompt)
@@ -522,10 +550,90 @@ app.whenReady().then(async () => {
     return sessionManager.killSession(sessionId)
   })
 
+  // Claude History IPC handlers
+  ipcMain.handle('claude-history:detect', async () => {
+    return claudeHistoryService.detect()
+  })
+
+  ipcMain.handle('claude-history:getProjects', async () => {
+    return claudeHistoryService.getProjects()
+  })
+
+  ipcMain.handle('claude-history:getSessions', async (_, encodedProjectPath: string) => {
+    return claudeHistoryService.getSessionsForProject(encodedProjectPath)
+  })
+
+  ipcMain.handle('claude-history:getMessages', async (_, sessionId: string, encodedProjectPath: string, offset?: number, limit?: number) => {
+    return claudeHistoryService.getSessionMessages(sessionId, encodedProjectPath, offset, limit)
+  })
+
+  ipcMain.handle('claude-history:search', async (_, query: string, limit?: number) => {
+    return claudeHistoryService.searchSessions(query, limit)
+  })
+
+  ipcMain.handle('claude-history:getSessionStats', async (_, sessionId: string, encodedProjectPath: string) => {
+    return claudeHistoryService.getSessionStats(sessionId, encodedProjectPath)
+  })
+
+  ipcMain.handle('claude-history:getProjectStats', async (_, encodedProjectPath: string) => {
+    return claudeHistoryService.getProjectStats(encodedProjectPath)
+  })
+
+  ipcMain.handle('claude-history:getGlobalStats', async () => {
+    return claudeHistoryService.getGlobalStats()
+  })
+
+  ipcMain.handle('claude-history:getRecentEdits', async (_, encodedProjectPath: string, limit?: number, offset?: number) => {
+    return claudeHistoryService.getRecentEdits(encodedProjectPath, limit, offset)
+  })
+
+  ipcMain.handle('claude-history:getSessionEdits', async (_, sessionId: string, encodedProjectPath: string) => {
+    return claudeHistoryService.getSessionEdits(sessionId, encodedProjectPath)
+  })
+
+  // Auto-sync IPC handlers
+  ipcMain.handle('claude-history:findProjectByPath', async (_, workspacePath: string) => {
+    return claudeHistoryService.findProjectByPath(workspacePath)
+  })
+
+  ipcMain.handle('claude-history:getAllProjectSummaries', async () => {
+    return claudeHistoryService.getAllProjectSummaries()
+  })
+
+  ipcMain.handle('claude-history:copyToWorkspace', async (_, workspacePath: string, encodedProjectPath: string) => {
+    return claudeHistoryService.copyToWorkspace(workspacePath, encodedProjectPath)
+  })
+
+  ipcMain.handle('claude-history:getWorkspaceHistory', async (_, workspacePath: string) => {
+    return claudeHistoryService.getWorkspaceHistory(workspacePath)
+  })
+
+  // Deleted sessions management
+  ipcMain.handle('claude-history:getDeletedSessions', async () => {
+    return claudeHistoryService.getDeletedSessions()
+  })
+
+  ipcMain.handle('claude-history:getDeletedSessionsForProject', async (_, encodedProjectPath: string) => {
+    return claudeHistoryService.getDeletedSessionsForProject(encodedProjectPath)
+  })
+
+  ipcMain.handle('claude-history:markSessionDeleted', async (_, encodedProjectPath: string, sessionId: string) => {
+    return claudeHistoryService.markSessionDeleted(encodedProjectPath, sessionId)
+  })
+
+  ipcMain.handle('claude-history:restoreSession', async (_, encodedProjectPath: string, sessionId: string) => {
+    return claudeHistoryService.restoreSession(encodedProjectPath, sessionId)
+  })
+
+  ipcMain.handle('claude-history:clearDeletedSessionsForProject', async (_, encodedProjectPath: string) => {
+    return claudeHistoryService.clearDeletedSessionsForProject(encodedProjectPath)
+  })
+
   // Cleanup on app quit
   app.on('before-quit', () => {
     sessionManager.killAllSessions()
     fileWatcher.close()
+    claudeHistoryService.stopWatching()
   })
 
   app.on('activate', async function () {

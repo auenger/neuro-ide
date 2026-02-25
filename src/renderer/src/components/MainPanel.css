@@ -367,3 +367,64 @@
     border-color: var(--cc-accent-secondary);
     box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
 }
+
+/* Layout Toggle Button */
+.layout-toggle-btn {
+    position: relative;
+}
+
+/* Grid Config Dropdown */
+.grid-config-wrapper {
+    position: relative;
+}
+
+.grid-config-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+}
+
+.grid-config-label {
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+}
+
+.grid-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: var(--cc-bg-elevated);
+    border: 1px solid var(--cc-border-primary);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    min-width: 80px;
+    overflow: hidden;
+}
+
+.grid-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    color: var(--cc-text-secondary);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.grid-dropdown-item:hover {
+    background: var(--cc-bg-tertiary);
+    color: var(--cc-text-primary);
+}
+
+.grid-dropdown-item.active {
+    background: var(--cc-accent-primary);
+    color: var(--cc-bg-primary);
+}

@@ -277,3 +277,129 @@
 .preview-pane a:hover {
     border-bottom-color: var(--cc-accent-secondary);
 }
+
+/* Editor tab switcher */
+.editor-tab-switcher {
+    display: flex;
+    gap: 4px;
+    background: var(--cc-bg-elevated);
+    padding: 3px;
+    border-radius: 2px;
+    border: 1px solid var(--cc-border-secondary);
+}
+
+.editor-tab-switcher .tab {
+    background: transparent;
+    border: none;
+    color: var(--cc-text-tertiary);
+    cursor: pointer;
+    padding: 6px 14px;
+    border-radius: 2px;
+    transition: all var(--transition-base);
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.editor-tab-switcher .tab:hover {
+    background: var(--cc-bg-tertiary);
+    color: var(--cc-text-primary);
+}
+
+.editor-tab-switcher .tab.active {
+    background: var(--cc-accent-secondary);
+    color: var(--cc-bg-primary);
+}
+
+/* Init commands editor */
+.init-commands-editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--cc-bg-primary);
+}
+
+.init-commands-textarea-wrapper {
+    flex: 1;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.init-commands-textarea-wrapper textarea {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--cc-text-primary);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.7;
+    resize: none;
+    padding: 0;
+}
+
+.init-commands-textarea-wrapper textarea::selection {
+    background: var(--cc-accent-primary);
+    color: var(--cc-bg-primary);
+}
+
+.init-commands-textarea-wrapper textarea::placeholder {
+    color: var(--cc-text-muted);
+}
+
+.init-commands-options {
+    padding: 12px 20px;
+    border-top: 1px solid var(--cc-border-primary);
+    background: var(--cc-bg-tertiary);
+}
+
+.init-commands-options .toggle-switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.init-commands-options .toggle-switch {
+    width: 36px;
+    height: 20px;
+    background: var(--cc-bg-elevated);
+    border-radius: 10px;
+    position: relative;
+    transition: background-color var(--transition-base);
+    border: 1px solid var(--cc-border-secondary);
+}
+
+.init-commands-options .toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: var(--cc-text-tertiary);
+    border-radius: 50%;
+    transition: all var(--transition-base);
+}
+
+.init-commands-options .toggle-switch.checked {
+    background: var(--cc-accent-primary);
+    border-color: var(--cc-accent-primary);
+}
+
+.init-commands-options .toggle-switch.checked .toggle-knob {
+    transform: translateX(16px);
+    background: var(--cc-bg-primary);
+}
+
+.init-commands-options .toggle-switch-wrapper:hover .toggle-switch {
+    border-color: var(--cc-accent-secondary);
+}
+
+.init-commands-options .toggle-switch-wrapper span {
+    font-size: 13px;
+    color: var(--cc-text-secondary);
+}

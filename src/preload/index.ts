@@ -35,7 +35,9 @@ const api = {
       return () => ipcRenderer.removeListener('file:changed', handler)
     },
     searchInWorkspace: (workspacePath: string, query: string) =>
-      ipcRenderer.invoke('fs:searchInWorkspace', { workspacePath, query })
+      ipcRenderer.invoke('fs:searchInWorkspace', { workspacePath, query }),
+    setIgnoredDirectories: (ignoredDirectories: string[]) =>
+      ipcRenderer.send('fileWatcher:setIgnoredDirectories', { ignoredDirectories })
   },
 
   // Config management
@@ -67,6 +69,54 @@ const api = {
       ipcRenderer.on('session:exited', handler)
       return () => ipcRenderer.removeListener('session:exited', handler)
     }
+  },
+
+  // Claude Code History
+  claudeHistory: {
+    detect: () => ipcRenderer.invoke('claude-history:detect'),
+    getProjects: () => ipcRenderer.invoke('claude-history:getProjects'),
+    getSessions: (encodedProjectPath: string) =>
+      ipcRenderer.invoke('claude-history:getSessions', encodedProjectPath),
+    getMessages: (sessionId: string, encodedProjectPath: string, offset?: number, limit?: number) =>
+      ipcRenderer.invoke('claude-history:getMessages', sessionId, encodedProjectPath, offset, limit),
+    search: (query: string, limit?: number) =>
+      ipcRenderer.invoke('claude-history:search', query, limit),
+    getSessionStats: (sessionId: string, encodedProjectPath: string) =>
+      ipcRenderer.invoke('claude-history:getSessionStats', sessionId, encodedProjectPath),
+    getProjectStats: (encodedProjectPath: string) =>
+      ipcRenderer.invoke('claude-history:getProjectStats', encodedProjectPath),
+    getGlobalStats: () => ipcRenderer.invoke('claude-history:getGlobalStats'),
+    getRecentEdits: (encodedProjectPath: string, limit?: number, offset?: number) =>
+      ipcRenderer.invoke('claude-history:getRecentEdits', encodedProjectPath, limit, offset),
+    getSessionEdits: (sessionId: string, encodedProjectPath: string) =>
+      ipcRenderer.invoke('claude-history:getSessionEdits', sessionId, encodedProjectPath),
+    onChanged: (callback: (data: { event: string; path: string; timestamp: number }) => void) => {
+      const handler = (_: any, payload: { event: string; path: string; timestamp: number }) => {
+        callback(payload)
+      }
+      ipcRenderer.on('claude-history:changed', handler)
+      return () => ipcRenderer.removeListener('claude-history:changed', handler)
+    },
+    // Auto-sync methods
+    findProjectByPath: (workspacePath: string) =>
+      ipcRenderer.invoke('claude-history:findProjectByPath', workspacePath),
+    getAllProjectSummaries: () =>
+      ipcRenderer.invoke('claude-history:getAllProjectSummaries'),
+    copyToWorkspace: (workspacePath: string, encodedProjectPath: string) =>
+      ipcRenderer.invoke('claude-history:copyToWorkspace', workspacePath, encodedProjectPath),
+    getWorkspaceHistory: (workspacePath: string) =>
+      ipcRenderer.invoke('claude-history:getWorkspaceHistory', workspacePath),
+    // Deleted sessions management
+    getDeletedSessions: () =>
+      ipcRenderer.invoke('claude-history:getDeletedSessions'),
+    getDeletedSessionsForProject: (encodedProjectPath: string) =>
+      ipcRenderer.invoke('claude-history:getDeletedSessionsForProject', encodedProjectPath),
+    markSessionDeleted: (encodedProjectPath: string, sessionId: string) =>
+      ipcRenderer.invoke('claude-history:markSessionDeleted', encodedProjectPath, sessionId),
+    restoreSession: (encodedProjectPath: string, sessionId: string) =>
+      ipcRenderer.invoke('claude-history:restoreSession', encodedProjectPath, sessionId),
+    clearDeletedSessionsForProject: (encodedProjectPath: string) =>
+      ipcRenderer.invoke('claude-history:clearDeletedSessionsForProject', encodedProjectPath)
   }
 }
 
