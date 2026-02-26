@@ -160,7 +160,14 @@ export interface ClaudeMessage {
   parentUuid: string | null
   sessionId: string
   timestamp: string
-  type: 'user' | 'assistant' | 'system' | 'summary' | 'progress' | 'file-history-snapshot' | 'queue-operation'
+  type:
+    | 'user'
+    | 'assistant'
+    | 'system'
+    | 'summary'
+    | 'progress'
+    | 'file-history-snapshot'
+    | 'queue-operation'
   message?: MessageContent
   content?: string | ContentItem[]
   projectName?: string
@@ -204,7 +211,7 @@ export interface ClaudeSession {
   filePath: string
   projectPath: string
   projectName: string
-  encodedProjectPath: string  // 添加此字段，用于加载消息
+  encodedProjectPath: string // 添加此字段，用于加载消息
   messageCount: number
   firstMessageTime: string | null
   lastMessageTime: string | null
@@ -449,7 +456,7 @@ export class ClaudeHistoryService {
       messageCount: totalMessages,
       lastModified: latestActivity || new Date().toISOString(),
       // 保存所有匹配的项目信息，以便后续获取会话时使用
-      _matchedProjects: matchedData.map(d => d.encodedPath)
+      _matchedProjects: matchedData.map((d) => d.encodedPath)
     } as ClaudeProject & { _matchedProjects: string[] }
   }
 
@@ -467,7 +474,7 @@ export class ClaudeHistoryService {
     if (!existsSync(projectDir)) return null
 
     const entries = await fs.readdir(projectDir, { withFileTypes: true })
-    const sessionFiles = entries.filter(e => e.isFile() && e.name.endsWith('.jsonl'))
+    const sessionFiles = entries.filter((e) => e.isFile() && e.name.endsWith('.jsonl'))
 
     if (sessionFiles.length === 0) {
       return null
@@ -498,13 +505,15 @@ export class ClaudeHistoryService {
   /**
    * Get all available projects as summaries for quick loading
    */
-  async getAllProjectSummaries(): Promise<Array<{
-    name: string
-    encodedPath: string
-    actualPath: string
-    sessionCount: number
-    lastModified: string
-  }>> {
+  async getAllProjectSummaries(): Promise<
+    Array<{
+      name: string
+      encodedPath: string
+      actualPath: string
+      sessionCount: number
+      lastModified: string
+    }>
+  > {
     if (!existsSync(this.projectsPath)) return []
 
     const entries = await fs.readdir(this.projectsPath, { withFileTypes: true })
@@ -532,7 +541,10 @@ export class ClaudeHistoryService {
   /**
    * Copy project history to workspace .neuro folder
    */
-  async copyToWorkspace(workspacePath: string, encodedProjectPath: string): Promise<{
+  async copyToWorkspace(
+    workspacePath: string,
+    encodedProjectPath: string
+  ): Promise<{
     success: boolean
     message: string
     copiedSessions: number
@@ -580,10 +592,7 @@ export class ClaudeHistoryService {
         sessionCount: copiedCount
       }
 
-      await fs.writeFile(
-        join(claudeHistoryDir, 'metadata.json'),
-        JSON.stringify(metadata, null, 2)
-      )
+      await fs.writeFile(join(claudeHistoryDir, 'metadata.json'), JSON.stringify(metadata, null, 2))
 
       return {
         success: true,
@@ -659,8 +668,8 @@ export class ClaudeHistoryService {
   }
 
   async detect(): Promise<ClaudeHistoryProviderInfo> {
-    const isAvailable = existsSync(this.projectsPath) &&
-      (await fs.stat(this.projectsPath)).isDirectory()
+    const isAvailable =
+      existsSync(this.projectsPath) && (await fs.stat(this.projectsPath)).isDirectory()
 
     return {
       id: 'claude',
@@ -747,9 +756,7 @@ export class ClaudeHistoryService {
         continue
       }
 
-      const candidate = basePath.length === 0
-        ? '/' + segment
-        : basePath + '/' + segment
+      const candidate = basePath.length === 0 ? '/' + segment : basePath + '/' + segment
 
       // Check if this path exists and is a directory
       try {
@@ -816,13 +823,14 @@ export class ClaudeHistoryService {
       const projectName = this.extractProjectName(decodedPath)
 
       const sessions = await this.getSessionsForProject(encodedPath)
-      const lastActivity = sessions.length > 0
-        ? sessions.reduce((latest, s) =>
-          (s.lastModified && (!latest || s.lastModified > latest))
-            ? s.lastModified
-            : latest
-          , null as string | null)
-        : null
+      const lastActivity =
+        sessions.length > 0
+          ? sessions.reduce(
+              (latest, s) =>
+                s.lastModified && (!latest || s.lastModified > latest) ? s.lastModified : latest,
+              null as string | null
+            )
+          : null
 
       const totalMessages = sessions.reduce((sum, s) => sum + s.messageCount, 0)
 
@@ -912,13 +920,14 @@ export class ClaudeHistoryService {
         }
 
         if (!preview && msgType === 'user' && raw.message?.content) {
-          const content = typeof raw.message.content === 'string'
-            ? raw.message.content
-            : Array.isArray(raw.message.content)
-              ? raw.message.content.map((c: any) =>
-                typeof c === 'string' ? c : c.text || ''
-              ).join(' ')
-              : ''
+          const content =
+            typeof raw.message.content === 'string'
+              ? raw.message.content
+              : Array.isArray(raw.message.content)
+                ? raw.message.content
+                    .map((c: any) => (typeof c === 'string' ? c : c.text || ''))
+                    .join(' ')
+                : ''
           preview = content.slice(0, 100) + (content.length > 100 ? '...' : '')
         }
 
@@ -970,7 +979,10 @@ export class ClaudeHistoryService {
     }
 
     const content = await fs.readFile(filePath, 'utf-8')
-    const lines = content.trim().split('\n').filter(l => l.trim())
+    const lines = content
+      .trim()
+      .split('\n')
+      .filter((l) => l.trim())
 
     const allMessages: ClaudeMessage[] = []
 
@@ -1020,7 +1032,10 @@ export class ClaudeHistoryService {
     }
   }
 
-  async getSessionStats(sessionId: string, encodedProjectPath: string): Promise<SessionTokenStats | null> {
+  async getSessionStats(
+    sessionId: string,
+    encodedProjectPath: string
+  ): Promise<SessionTokenStats | null> {
     const { messages } = await this.getSessionMessages(sessionId, encodedProjectPath, 0, 10000)
 
     if (messages.length === 0) return null
@@ -1074,9 +1089,7 @@ export class ClaudeHistoryService {
       .sort((a, b) => b.usage_count - a.usage_count)
       .slice(0, 10)
 
-    const sortedMessages = [...messages].sort((a, b) =>
-      a.timestamp.localeCompare(b.timestamp)
-    )
+    const sortedMessages = [...messages].sort((a, b) => a.timestamp.localeCompare(b.timestamp))
 
     return {
       session_id: sessionId,
@@ -1181,7 +1194,12 @@ export class ClaudeHistoryService {
     let totalTokens = 0
     const allDailyStats: Record<string, DailyStats> = {}
     const allToolUsage: Record<string, number> = {}
-    const projectRankings: { project_name: string; sessions: number; messages: number; tokens: number }[] = []
+    const projectRankings: {
+      project_name: string
+      sessions: number
+      messages: number
+      tokens: number
+    }[] = []
 
     let firstMessage: string | undefined
     let lastMessage: string | undefined
@@ -1225,9 +1243,7 @@ export class ClaudeHistoryService {
       }
     }
 
-    const top_projects = projectRankings
-      .sort((a, b) => b.tokens - a.tokens)
-      .slice(0, 10)
+    const top_projects = projectRankings.sort((a, b) => b.tokens - a.tokens).slice(0, 10)
 
     const most_used_tools: ToolUsageStats[] = Object.entries(allToolUsage)
       .map(([name, count]) => ({
@@ -1240,9 +1256,10 @@ export class ClaudeHistoryService {
 
     const firstDate = firstMessage ? new Date(firstMessage) : null
     const lastDate = lastMessage ? new Date(lastMessage) : null
-    const days_span = firstDate && lastDate
-      ? Math.ceil((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24))
-      : 0
+    const days_span =
+      firstDate && lastDate
+        ? Math.ceil((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24))
+        : 0
 
     return {
       total_projects: projects.length,
@@ -1268,10 +1285,7 @@ export class ClaudeHistoryService {
     }
   }
 
-  async getSessionEdits(
-    sessionId: string,
-    encodedProjectPath: string
-  ): Promise<FileEdit[]> {
+  async getSessionEdits(sessionId: string, encodedProjectPath: string): Promise<FileEdit[]> {
     const projectPath = this.decodeProjectPath(encodedProjectPath)
     const edits: FileEdit[] = []
     const projectName = this.extractProjectName(projectPath)
@@ -1283,7 +1297,10 @@ export class ClaudeHistoryService {
       const content = msg.content || msg.message?.content
       if (Array.isArray(content)) {
         for (const item of content) {
-          if (item.type === 'tool_use' && (item.name === 'Write' || item.name === 'Edit' || item.name === 'MultiEdit')) {
+          if (
+            item.type === 'tool_use' &&
+            (item.name === 'Write' || item.name === 'Edit' || item.name === 'MultiEdit')
+          ) {
             const input = item.input || {}
             const filePath = input.file_path || input.path || ''
 
@@ -1291,7 +1308,8 @@ export class ClaudeHistoryService {
               edits.push({
                 path: filePath,
                 oldContent: input.old_string || '',
-                newContent: typeof input.content === 'string' ? input.content : JSON.stringify(input.content),
+                newContent:
+                  typeof input.content === 'string' ? input.content : JSON.stringify(input.content),
                 timestamp: msg.timestamp,
                 sessionId: msg.sessionId,
                 projectName
@@ -1312,8 +1330,12 @@ export class ClaudeHistoryService {
               // MultiEdit with multiple edits
               const filePath = input.file_path || input.path || ''
               if (filePath) {
-                const combinedNewContent = input.edits.map((e: any) => e.new_string || '').join('\n')
-                const combinedOldContent = input.edits.map((e: any) => e.old_string || '').join('\n')
+                const combinedNewContent = input.edits
+                  .map((e: any) => e.new_string || '')
+                  .join('\n')
+                const combinedOldContent = input.edits
+                  .map((e: any) => e.old_string || '')
+                  .join('\n')
                 edits.push({
                   path: filePath,
                   oldContent: combinedOldContent,
@@ -1418,7 +1440,10 @@ export class ClaudeHistoryService {
         const content = msg.content || msg.message?.content
         if (Array.isArray(content)) {
           for (const item of content) {
-            if (item.type === 'tool_use' && (item.name === 'Write' || item.name === 'Edit' || item.name === 'MultiEdit')) {
+            if (
+              item.type === 'tool_use' &&
+              (item.name === 'Write' || item.name === 'Edit' || item.name === 'MultiEdit')
+            ) {
               const input = item.input || {}
               const filePath = input.file_path || input.path || ''
 
@@ -1426,7 +1451,10 @@ export class ClaudeHistoryService {
                 allEdits.push({
                   path: filePath,
                   oldContent: input.old_string || '',
-                  newContent: typeof input.content === 'string' ? input.content : JSON.stringify(input.content),
+                  newContent:
+                    typeof input.content === 'string'
+                      ? input.content
+                      : JSON.stringify(input.content),
                   timestamp: msg.timestamp,
                   sessionId: msg.sessionId,
                   projectName: session.projectName
@@ -1447,8 +1475,12 @@ export class ClaudeHistoryService {
                 // MultiEdit with multiple edits
                 const filePath = input.file_path || input.path || ''
                 if (filePath) {
-                  const combinedNewContent = input.edits.map((e: any) => e.new_string || '').join('\n')
-                  const combinedOldContent = input.edits.map((e: any) => e.old_string || '').join('\n')
+                  const combinedNewContent = input.edits
+                    .map((e: any) => e.new_string || '')
+                    .join('\n')
+                  const combinedOldContent = input.edits
+                    .map((e: any) => e.old_string || '')
+                    .join('\n')
                   allEdits.push({
                     path: filePath,
                     oldContent: combinedOldContent,
@@ -1534,8 +1566,8 @@ export class ClaudeHistoryService {
     }
 
     // Filter edits to only include files within the project directory
-    const filteredEdits = allEdits.filter(edit =>
-      edit.path.startsWith(projectPath) || edit.path.startsWith('/')
+    const filteredEdits = allEdits.filter(
+      (edit) => edit.path.startsWith(projectPath) || edit.path.startsWith('/')
     )
 
     // Sort by timestamp descending
@@ -1562,10 +1594,15 @@ export class ClaudeHistoryService {
     }
   }
 
-  async searchSessions(query: string, limit: number = 50): Promise<{
-    session: ClaudeSession
-    matchingMessages: ClaudeMessage[]
-  }[]> {
+  async searchSessions(
+    query: string,
+    limit: number = 50
+  ): Promise<
+    {
+      session: ClaudeSession
+      matchingMessages: ClaudeMessage[]
+    }[]
+  > {
     const projects = await this.getProjects()
     const results: { session: ClaudeSession; matchingMessages: ClaudeMessage[] }[] = []
     const queryLower = query.toLowerCase()
@@ -1604,14 +1641,16 @@ export class ClaudeHistoryService {
     if (typeof content === 'string') return content
 
     if (Array.isArray(content)) {
-      return content.map(c => {
-        if (typeof c === 'string') return c
-        if (c.type === 'text') return c.text || ''
-        if (c.type === 'thinking') return c.thinking || ''
-        if (c.type === 'tool_use') return `${c.name}: ${JSON.stringify(c.input)}`
-        if (c.type === 'tool_result') return c.content || ''
-        return ''
-      }).join(' ')
+      return content
+        .map((c) => {
+          if (typeof c === 'string') return c
+          if (c.type === 'text') return c.text || ''
+          if (c.type === 'thinking') return c.thinking || ''
+          if (c.type === 'tool_use') return `${c.name}: ${JSON.stringify(c.input)}`
+          if (c.type === 'tool_result') return c.content || ''
+          return ''
+        })
+        .join(' ')
     }
 
     return ''

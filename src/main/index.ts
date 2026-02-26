@@ -26,14 +26,20 @@ class SessionManager {
       this.shell = process.env.SHELL || '/bin/bash'
     }
     this.workingDirectory = workingDirectory || os.homedir()
-    console.log(`SessionManager initialized with shell: ${this.shell}, cwd: ${this.workingDirectory}`)
+    console.log(
+      `SessionManager initialized with shell: ${this.shell}, cwd: ${this.workingDirectory}`
+    )
   }
 
   setWorkingDirectory(dir: string): void {
     this.workingDirectory = dir
   }
 
-  createSession(sessionId: string, mainWindow: BrowserWindow, customPrompt?: string): number | null {
+  createSession(
+    sessionId: string,
+    mainWindow: BrowserWindow,
+    customPrompt?: string
+  ): number | null {
     // Kill existing session if any
     if (this.sessions.has(sessionId)) {
       try {
@@ -79,7 +85,12 @@ class SessionManager {
         env: env as Record<string, string>
       })
 
-      console.log(`✓ Session ${sessionId} created with PID:`, ptyProcess.pid, 'in', this.workingDirectory)
+      console.log(
+        `✓ Session ${sessionId} created with PID:`,
+        ptyProcess.pid,
+        'in',
+        this.workingDirectory
+      )
 
       ptyProcess.onData((data) => {
         if (!mainWindow.isDestroyed()) {
@@ -250,10 +261,12 @@ function createWindow(): BrowserWindow {
     title: 'Neuro',
     backgroundColor: '#1b1b1f', // Match the app's dark theme
     // Use default Windows title bar with dark theme
-    ...(process.platform === 'win32' ? {
-      titleBarStyle: 'default',
-      frame: true
-    } : {}),
+    ...(process.platform === 'win32'
+      ? {
+          titleBarStyle: 'default',
+          frame: true
+        }
+      : {}),
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -380,7 +393,11 @@ app.whenReady().then(async () => {
       // Add to recent workspaces
       await recentWorkspacesManager.addWorkspace(workspacePath)
       // Save current workspace
-      await tempConfigManager.saveConfig('current-workspace.json', { path: workspacePath }, 'global')
+      await tempConfigManager.saveConfig(
+        'current-workspace.json',
+        { path: workspacePath },
+        'global'
+      )
       return { success: true, path: workspacePath }
     }
 
@@ -399,7 +416,7 @@ app.whenReady().then(async () => {
   ipcMain.handle('fs:readDir', async (_, dirPath: string) => {
     try {
       const entries = await fs.readdir(dirPath, { withFileTypes: true })
-      return entries.map(entry => ({
+      return entries.map((entry) => ({
         name: entry.name,
         isDirectory: entry.isDirectory(),
         path: join(dirPath, entry.name)
@@ -448,7 +465,12 @@ app.whenReady().then(async () => {
           const fullPath = join(dir, file.name)
 
           if (file.isDirectory()) {
-            if (['node_modules', '.git', 'dist', 'out', 'build', '.idea', '.vscode'].includes(file.name)) continue
+            if (
+              ['node_modules', '.git', 'dist', 'out', 'build', '.idea', '.vscode'].includes(
+                file.name
+              )
+            )
+              continue
             await searchRecursively(fullPath)
           } else {
             // Check if filename matches (case-insensitive)
@@ -456,7 +478,36 @@ app.whenReady().then(async () => {
 
             // Skip binary or large files check could go here
             // For now simply try to read as text
-            if (['.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.mp3', '.wav', '.zip', '.tar', '.gz', '.7z', '.pdf', '.exe', '.dll', '.so', '.dylib', '.class', '.pyc'].some(ext => file.name.endsWith(ext))) continue
+            if (
+              [
+                '.png',
+                '.jpg',
+                '.jpeg',
+                '.gif',
+                '.ico',
+                '.svg',
+                '.woff',
+                '.woff2',
+                '.ttf',
+                '.eot',
+                '.mp4',
+                '.webm',
+                '.mp3',
+                '.wav',
+                '.zip',
+                '.tar',
+                '.gz',
+                '.7z',
+                '.pdf',
+                '.exe',
+                '.dll',
+                '.so',
+                '.dylib',
+                '.class',
+                '.pyc'
+              ].some((ext) => file.name.endsWith(ext))
+            )
+              continue
 
             if (isFilenameMatch) {
               // Add filename match with special marker
@@ -528,9 +579,12 @@ app.whenReady().then(async () => {
   })
 
   // Update ignored directories for file watcher
-  ipcMain.on('fileWatcher:setIgnoredDirectories', (_, { ignoredDirectories }: { ignoredDirectories: string[] }) => {
-    fileWatcher.setIgnoredDirectories(ignoredDirectories)
-  })
+  ipcMain.on(
+    'fileWatcher:setIgnoredDirectories',
+    (_, { ignoredDirectories }: { ignoredDirectories: string[] }) => {
+      fileWatcher.setIgnoredDirectories(ignoredDirectories)
+    }
+  )
 
   // Session IPC handlers
   ipcMain.handle('session:create', (_, sessionId: string, customPrompt?: string) => {
@@ -563,17 +617,23 @@ app.whenReady().then(async () => {
     return claudeHistoryService.getSessionsForProject(encodedProjectPath)
   })
 
-  ipcMain.handle('claude-history:getMessages', async (_, sessionId: string, encodedProjectPath: string, offset?: number, limit?: number) => {
-    return claudeHistoryService.getSessionMessages(sessionId, encodedProjectPath, offset, limit)
-  })
+  ipcMain.handle(
+    'claude-history:getMessages',
+    async (_, sessionId: string, encodedProjectPath: string, offset?: number, limit?: number) => {
+      return claudeHistoryService.getSessionMessages(sessionId, encodedProjectPath, offset, limit)
+    }
+  )
 
   ipcMain.handle('claude-history:search', async (_, query: string, limit?: number) => {
     return claudeHistoryService.searchSessions(query, limit)
   })
 
-  ipcMain.handle('claude-history:getSessionStats', async (_, sessionId: string, encodedProjectPath: string) => {
-    return claudeHistoryService.getSessionStats(sessionId, encodedProjectPath)
-  })
+  ipcMain.handle(
+    'claude-history:getSessionStats',
+    async (_, sessionId: string, encodedProjectPath: string) => {
+      return claudeHistoryService.getSessionStats(sessionId, encodedProjectPath)
+    }
+  )
 
   ipcMain.handle('claude-history:getProjectStats', async (_, encodedProjectPath: string) => {
     return claudeHistoryService.getProjectStats(encodedProjectPath)
@@ -583,13 +643,19 @@ app.whenReady().then(async () => {
     return claudeHistoryService.getGlobalStats()
   })
 
-  ipcMain.handle('claude-history:getRecentEdits', async (_, encodedProjectPath: string, limit?: number, offset?: number) => {
-    return claudeHistoryService.getRecentEdits(encodedProjectPath, limit, offset)
-  })
+  ipcMain.handle(
+    'claude-history:getRecentEdits',
+    async (_, encodedProjectPath: string, limit?: number, offset?: number) => {
+      return claudeHistoryService.getRecentEdits(encodedProjectPath, limit, offset)
+    }
+  )
 
-  ipcMain.handle('claude-history:getSessionEdits', async (_, sessionId: string, encodedProjectPath: string) => {
-    return claudeHistoryService.getSessionEdits(sessionId, encodedProjectPath)
-  })
+  ipcMain.handle(
+    'claude-history:getSessionEdits',
+    async (_, sessionId: string, encodedProjectPath: string) => {
+      return claudeHistoryService.getSessionEdits(sessionId, encodedProjectPath)
+    }
+  )
 
   // Auto-sync IPC handlers
   ipcMain.handle('claude-history:findProjectByPath', async (_, workspacePath: string) => {
@@ -600,9 +666,12 @@ app.whenReady().then(async () => {
     return claudeHistoryService.getAllProjectSummaries()
   })
 
-  ipcMain.handle('claude-history:copyToWorkspace', async (_, workspacePath: string, encodedProjectPath: string) => {
-    return claudeHistoryService.copyToWorkspace(workspacePath, encodedProjectPath)
-  })
+  ipcMain.handle(
+    'claude-history:copyToWorkspace',
+    async (_, workspacePath: string, encodedProjectPath: string) => {
+      return claudeHistoryService.copyToWorkspace(workspacePath, encodedProjectPath)
+    }
+  )
 
   ipcMain.handle('claude-history:getWorkspaceHistory', async (_, workspacePath: string) => {
     return claudeHistoryService.getWorkspaceHistory(workspacePath)
@@ -613,21 +682,33 @@ app.whenReady().then(async () => {
     return claudeHistoryService.getDeletedSessions()
   })
 
-  ipcMain.handle('claude-history:getDeletedSessionsForProject', async (_, encodedProjectPath: string) => {
-    return claudeHistoryService.getDeletedSessionsForProject(encodedProjectPath)
-  })
+  ipcMain.handle(
+    'claude-history:getDeletedSessionsForProject',
+    async (_, encodedProjectPath: string) => {
+      return claudeHistoryService.getDeletedSessionsForProject(encodedProjectPath)
+    }
+  )
 
-  ipcMain.handle('claude-history:markSessionDeleted', async (_, encodedProjectPath: string, sessionId: string) => {
-    return claudeHistoryService.markSessionDeleted(encodedProjectPath, sessionId)
-  })
+  ipcMain.handle(
+    'claude-history:markSessionDeleted',
+    async (_, encodedProjectPath: string, sessionId: string) => {
+      return claudeHistoryService.markSessionDeleted(encodedProjectPath, sessionId)
+    }
+  )
 
-  ipcMain.handle('claude-history:restoreSession', async (_, encodedProjectPath: string, sessionId: string) => {
-    return claudeHistoryService.restoreSession(encodedProjectPath, sessionId)
-  })
+  ipcMain.handle(
+    'claude-history:restoreSession',
+    async (_, encodedProjectPath: string, sessionId: string) => {
+      return claudeHistoryService.restoreSession(encodedProjectPath, sessionId)
+    }
+  )
 
-  ipcMain.handle('claude-history:clearDeletedSessionsForProject', async (_, encodedProjectPath: string) => {
-    return claudeHistoryService.clearDeletedSessionsForProject(encodedProjectPath)
-  })
+  ipcMain.handle(
+    'claude-history:clearDeletedSessionsForProject',
+    async (_, encodedProjectPath: string) => {
+      return claudeHistoryService.clearDeletedSessionsForProject(encodedProjectPath)
+    }
+  )
 
   // Cleanup on app quit
   app.on('before-quit', () => {
@@ -664,7 +745,11 @@ app.whenReady().then(async () => {
   if (workspaceFromArgs) {
     sessionManager.setWorkingDirectory(workspaceFromArgs)
     fileWatcher.watch(workspaceFromArgs)
-    await tempConfigManager.saveConfig('current-workspace.json', { path: workspaceFromArgs }, 'global')
+    await tempConfigManager.saveConfig(
+      'current-workspace.json',
+      { path: workspaceFromArgs },
+      'global'
+    )
     mainWindow.webContents.send('workspace:opened', { path: workspaceFromArgs })
   } else {
     // Try to load last workspace
@@ -691,7 +776,11 @@ app.whenReady().then(async () => {
           sessionManager.setWorkingDirectory(selectedWorkspace)
           fileWatcher.watch(selectedWorkspace)
           await recentWorkspacesManager.addWorkspace(selectedWorkspace)
-          await tempConfigManager.saveConfig('current-workspace.json', { path: selectedWorkspace }, 'global')
+          await tempConfigManager.saveConfig(
+            'current-workspace.json',
+            { path: selectedWorkspace },
+            'global'
+          )
           mainWindow!.webContents.send('workspace:opened', { path: selectedWorkspace })
         }
       })

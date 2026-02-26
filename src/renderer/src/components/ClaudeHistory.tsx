@@ -30,7 +30,14 @@ interface Props {
   onClose?: () => void
 }
 
-type ViewMode = 'projects' | 'sessions' | 'messages' | 'analytics' | 'search' | 'recentEdits' | 'sessionBoard'
+type ViewMode =
+  | 'projects'
+  | 'sessions'
+  | 'messages'
+  | 'analytics'
+  | 'search'
+  | 'recentEdits'
+  | 'sessionBoard'
 type MainTab = 'history' | 'analytics'
 
 // ============================================================================
@@ -43,12 +50,7 @@ type MainTab = 'history' | 'analytics'
 
 // 机器人头像 SVG 图标
 const RobotIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-  >
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <rect x="5" y="3" width="14" height="14" rx="3" stroke="currentColor" strokeWidth="1.5" />
     <path d="M12 3V1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     <circle cx="12" cy="1" r="0.75" fill="currentColor" />
@@ -64,23 +66,53 @@ const RobotIcon: React.FC<{ className?: string }> = ({ className }) => (
 // Read 图标 (文档)
 const ReadIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M14 2v6h6M16 13H8M16 17H8M10 9H8"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
 // Write 图标 (编辑/铅笔)
 const WriteIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
 // Edit 图标 (修改)
 const EditIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
@@ -88,7 +120,13 @@ const EditIcon: React.FC<{ className?: string }> = ({ className }) => (
 const BashIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M6 8l4 4-4 4M10 16h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M6 8l4 4-4 4M10 16h6"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
@@ -103,8 +141,18 @@ const GlobIcon: React.FC<{ className?: string }> = ({ className }) => (
 // Grep 图标 (文件搜索)
 const GrepIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M21 21l-4.35-4.35M14 10a4 4 0 1 1-8 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path
+      d="M21 21l-4.35-4.35M14 10a4 4 0 1 1-8 0"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M4 6h16M4 12h16M4 18h10"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
   </svg>
 )
 
@@ -120,7 +168,13 @@ const TaskIcon: React.FC<{ className?: string }> = ({ className }) => (
 const TodoWriteIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M9 12l2 2 4-4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
@@ -128,23 +182,52 @@ const TodoWriteIcon: React.FC<{ className?: string }> = ({ className }) => (
 const WebSearchIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="currentColor" strokeWidth="1.5" />
+    <path
+      d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
   </svg>
 )
 
 // WebFetch 图标 (下载)
 const WebFetchIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <polyline
+      points="7 10 12 15 17 10"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <line
+      x1="12"
+      y1="15"
+      x2="12"
+      y2="3"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
 // NotebookEdit 图标 (笔记本)
 const NotebookEditIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" strokeWidth="1.5" />
+    <path
+      d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
     <path d="M12 4v16M8 4v16M16 4v16" stroke="currentColor" strokeWidth="1" />
   </svg>
 )
@@ -162,7 +245,13 @@ const SkillIcon: React.FC<{ className?: string }> = ({ className }) => (
 const AskUserQuestionIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
     <circle cx="12" cy="17" r="1" fill="currentColor" />
   </svg>
 )
@@ -178,9 +267,30 @@ const EnterPlanModeIcon: React.FC<{ className?: string }> = ({ className }) => (
 // TaskOutput 图标 (上传/输出)
 const TaskOutputIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <polyline
+      points="17 8 12 3 7 8"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <line
+      x1="12"
+      y1="3"
+      x2="12"
+      y2="15"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
@@ -195,9 +305,30 @@ const TaskStopIcon: React.FC<{ className?: string }> = ({ className }) => (
 // TaskGet 图标 (下载/获取)
 const TaskGetIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <polyline
+      points="7 10 12 15 17 10"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <line
+      x1="12"
+      y1="15"
+      x2="12"
+      y2="3"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
@@ -206,32 +337,90 @@ const AnalyzeImageIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
     <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
-    <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M21 15l-5-5L5 21"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
 // WebReader 图标 (阅读/文档)
 const WebReaderIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M9 7h1M9 11h1M14 7h1M14 11h1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 7h1M9 11h1M14 7h1M14 11h1"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
 // AnalyzeDataVisualization 图标 (图表分析)
 const AnalyzeDataVisualizationIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <line x1="18" y1="20" x2="18" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="12" y1="20" x2="12" y2="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="6" y1="20" x2="6" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <line
+      x1="18"
+      y1="20"
+      x2="18"
+      y2="10"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <line
+      x1="12"
+      y1="20"
+      x2="12"
+      y2="4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <line
+      x1="6"
+      y1="20"
+      x2="6"
+      y2="14"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
 // AnalyzeVideo 图标 (视频分析)
 const AnalyzeVideoIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <polygon points="5 3 19 12 5 21 5 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <polygon
+      points="5 3 19 12 5 21 5 3"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
   </svg>
 )
 
@@ -247,9 +436,27 @@ const DiagnoseErrorScreenshotIcon: React.FC<{ className?: string }> = ({ classNa
 // ExtractTextFromScreenshot 图标 (文本提取)
 const ExtractTextFromScreenshotIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M18 9l-2 2M18 13l-2-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M14 2v6h6M16 13H8M16 17H8M10 9H8"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M18 9l-2 2M18 13l-2-2"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
@@ -257,17 +464,47 @@ const ExtractTextFromScreenshotIcon: React.FC<{ className?: string }> = ({ class
 const UiDiffCheckIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M21 21l-4.35-4.35M11 8v6M8 11h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M21 21l-4.35-4.35M11 8v6M8 11h6"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
 // UiToArtifact 图标 (UI 转换)
 const UiToArtifactIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M2 17l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M14 2l6 3.5M14 12l6 3.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M12 2L2 7l10 5 10-5-10-5z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M2 17l10 5 10-5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M2 12l10 5 10-5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M14 2l6 3.5M14 12l6 3.5"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
@@ -277,7 +514,12 @@ const UnderstandTechnicalDiagramIcon: React.FC<{ className?: string }> = ({ clas
     <rect x="3" y="3" width="7" height="7" stroke="currentColor" strokeWidth="1.5" />
     <rect x="14" y="3" width="7" height="7" stroke="currentColor" strokeWidth="1.5" />
     <rect x="14" y="14" width="7" height="7" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M6.5 10v4M6.5 17.5L10 14M10 17.5L6.5 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path
+      d="M6.5 10v4M6.5 17.5L10 14M10 17.5L6.5 14"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
     <path d="M14 6.5h4M17.5 6.5v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     <path d="M6.5 6.5h2M6.5 3v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
@@ -286,7 +528,13 @@ const UnderstandTechnicalDiagramIcon: React.FC<{ className?: string }> = ({ clas
 // 状态图标 - 成功
 const SuccessIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M20 6L9 17l-5-5"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
@@ -301,7 +549,7 @@ const ErrorIcon: React.FC<{ className?: string }> = ({ className }) => (
 // 状态图标 - 等待中
 const PendingIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25"/>
+    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
     <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
       <animateTransform
         attributeName="transform"
@@ -318,10 +566,20 @@ const PendingIcon: React.FC<{ className?: string }> = ({ className }) => (
 // 思考过程图标 - 大脑风格
 const ThinkingIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M9.5 3C6.5 3 4 5 3 8c-.5 1.5 0 3 1 4-.5 1-.5 2 0 3 .5 1 1.5 1.5 2.5 1.5.5 0 1 0 1.5-.5.5.5 0 0 0 0-1c-.5 0-1-.5-1.5-1-.5-.5-.5-1 0-1.5.5-.5.5-1 .5-1.5 0-1.5.5-3 1.5-4 1-1 2.5-1.5 4-1.5 1.5 0 3 .5 4 1.5 1 1 1.5 2.5 1.5 4 0 .5 0 1-.5 1.5-.5.5-.5 1 0 1.5.5.5 1 .5 1.5 1 2 0 .5-.5 1-1 1.5-.5.5-1 .5-1.5.5-.5 0-1-.5-1.5-1-.5-.5-.5-1 0-1.5.5-.5.5-1 .5-1.5 0-1-.5-2.5-1.5-3.5-1-1-2.5-1.5-4-1.5z"
-          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M8 9c.5-.5 1-.5 1.5 0M11 7.5c.5 0 1 .5 1 1M13 10.5c-.5.5-1 .5-1.5 0"
-          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M9.5 3C6.5 3 4 5 3 8c-.5 1.5 0 3 1 4-.5 1-.5 2 0 3 .5 1 1.5 1.5 2.5 1.5.5 0 1 0 1.5-.5.5.5 0 0 0 0-1c-.5 0-1-.5-1.5-1-.5-.5-.5-1 0-1.5.5-.5.5-1 .5-1.5 0-1.5.5-3 1.5-4 1-1 2.5-1.5 4-1.5 1.5 0 3 .5 4 1.5 1 1 1.5 2.5 1.5 4 0 .5 0 1-.5 1.5-.5.5-.5 1 0 1.5.5.5 1 .5 1.5 1 2 0 .5-.5 1-1 1.5-.5.5-1 .5-1.5.5-.5 0-1-.5-1.5-1-.5-.5-.5-1 0-1.5.5-.5.5-1 .5-1.5 0-1-.5-2.5-1.5-3.5-1-1-2.5-1.5-4-1.5z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 9c.5-.5 1-.5 1.5 0M11 7.5c.5 0 1 .5 1 1M13 10.5c-.5.5-1 .5-1.5 0"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
     <circle cx="8.5" cy="8" r="0.75" fill="currentColor" />
     <circle cx="12.5" cy="7" r="0.75" fill="currentColor" />
     <circle cx="10" cy="11" r="0.75" fill="currentColor" />
@@ -446,36 +704,51 @@ const isUserConfirmationOnly = (content: any): boolean => {
   if (typeof content === 'string') {
     const cleaned = content.trim().toLowerCase()
     // 检查是否是简单的确认词
-    const confirmations = ['yes', 'y', 'ok', 'okay', '好的', '继续', '确认', '是的', '对', '可以', '没问题']
+    const confirmations = [
+      'yes',
+      'y',
+      'ok',
+      'okay',
+      '好的',
+      '继续',
+      '确认',
+      '是的',
+      '对',
+      '可以',
+      '没问题'
+    ]
     return confirmations.includes(cleaned)
   }
 
   // 数组内容检查
   if (Array.isArray(content)) {
     // 检查是否只有 tool_result 且都是成功的
-    const hasOnlyToolResults = content.every(item =>
-      !item || item.type === 'tool_result' || !item.type
+    const hasOnlyToolResults = content.every(
+      (item) => !item || item.type === 'tool_result' || !item.type
     )
 
     if (hasOnlyToolResults) {
       // 检查是否所有 tool_result 都是成功的确认
-      const toolResults = content.filter(item => item?.type === 'tool_result')
+      const toolResults = content.filter((item) => item?.type === 'tool_result')
       if (toolResults.length > 0) {
         // 如果有错误结果，不认为是确认
-        const hasError = toolResults.some(item => item.is_error)
+        const hasError = toolResults.some((item) => item.is_error)
         if (hasError) return false
 
         // 检查内容是否是简单的确认
-        return toolResults.every(item => {
+        return toolResults.every((item) => {
           if (!item.content) return true
-          const contentStr = typeof item.content === 'string'
-            ? item.content.trim()
-            : JSON.stringify(item.content).trim()
+          const contentStr =
+            typeof item.content === 'string'
+              ? item.content.trim()
+              : JSON.stringify(item.content).trim()
           // 空内容或简短的成功消息
-          return contentStr.length < 10 ||
-                 contentStr.toLowerCase() === 'success' ||
-                 contentStr.toLowerCase() === 'ok' ||
-                 contentStr.toLowerCase() === 'done'
+          return (
+            contentStr.length < 10 ||
+            contentStr.toLowerCase() === 'success' ||
+            contentStr.toLowerCase() === 'ok' ||
+            contentStr.toLowerCase() === 'done'
+          )
         })
       }
     }
@@ -546,9 +819,8 @@ const generatePreview = (content: any): string => {
           // 用户消息中的 tool_result 不显示预览（会在 hasContent 检查时过滤）
           // Claude 消息中的 tool_result 显示状态
           if (item.content) {
-            const resultText = typeof item.content === 'string'
-              ? item.content
-              : JSON.stringify(item.content)
+            const resultText =
+              typeof item.content === 'string' ? item.content : JSON.stringify(item.content)
             const cleaned = resultText.replace(/\n+/g, ' ').trim()
             // 只显示错误结果
             if (item.is_error && cleaned.length > 5) {
@@ -613,7 +885,7 @@ const getLanguageFromPath = (filePath: string): string => {
     yaml: 'yaml',
     yml: 'yaml',
     sh: 'bash',
-    sql: 'sql',
+    sql: 'sql'
   }
   return langMap[ext] || 'text'
 }
@@ -624,7 +896,7 @@ const getLanguageFromPath = (filePath: string): string => {
 
 // 获取工具图标函数 (提取为独立函数，供多个组件使用)
 const getToolIcon = (name: string) => {
-  const iconClass = "ch-tool-svg-icon"
+  const iconClass = 'ch-tool-svg-icon'
   switch (name) {
     case 'Read':
       return <ReadIcon className={iconClass} />
@@ -686,8 +958,19 @@ const getToolIcon = (name: string) => {
     default:
       // 未知工具使用默认扳手图标
       return (
-        <svg className={iconClass} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <svg
+          className={iconClass}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       )
   }
@@ -710,7 +993,12 @@ const ThinkingRenderer: React.FC<{ content: ContentItem }> = ({ content }) => {
         <span className="ch-thinking-meta">{lineCount} 行</span>
         <svg
           className={`ch-tool-chevron ${expanded ? 'expanded' : ''}`}
-          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
         >
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -723,7 +1011,8 @@ const ThinkingRenderer: React.FC<{ content: ContentItem }> = ({ content }) => {
         </div>
       ) : (
         <div className="ch-thinking-preview">
-          {thinkingText.slice(0, 300)}{thinkingText.length > 300 ? '...' : ''}
+          {thinkingText.slice(0, 300)}
+          {thinkingText.length > 300 ? '...' : ''}
         </div>
       )}
     </div>
@@ -732,7 +1021,10 @@ const ThinkingRenderer: React.FC<{ content: ContentItem }> = ({ content }) => {
 
 // 备用工具渲染器（已被 UnifiedToolExecutionRenderer 取代，保留作为参考）
 // @ts-ignore - 未使用的备用组件
-const ToolUseRenderer: React.FC<{ content: ContentItem; result?: ContentItem }> = ({ content, result }) => {
+const ToolUseRenderer: React.FC<{ content: ContentItem; result?: ContentItem }> = ({
+  content,
+  result
+}) => {
   const [expanded, setExpanded] = useState(false)
 
   // 生成预览文本
@@ -765,9 +1057,7 @@ const ToolUseRenderer: React.FC<{ content: ContentItem; result?: ContentItem }> 
         <div className={`ch-tool-result ${isError ? 'error' : 'success'}`}>
           <div className="ch-tool-result-header">
             <span className="ch-tool-result-icon">{isError ? '❌' : '✓'}</span>
-            <span className="ch-tool-result-label">
-              {isError ? '执行失败' : '执行完成'}
-            </span>
+            <span className="ch-tool-result-label">{isError ? '执行失败' : '执行完成'}</span>
           </div>
           <div className="ch-bash-output">
             <pre>{resultContent}</pre>
@@ -781,13 +1071,16 @@ const ToolUseRenderer: React.FC<{ content: ContentItem; result?: ContentItem }> 
       <div className={`ch-tool-result ${isError ? 'error' : 'success'}`}>
         <div className="ch-tool-result-header">
           <span className="ch-tool-result-icon">{isError ? '❌' : '✓'}</span>
-          <span className="ch-tool-result-label">
-            {isError ? '错误' : '完成'}
-          </span>
+          <span className="ch-tool-result-label">{isError ? '错误' : '完成'}</span>
         </div>
         <div className="ch-tool-result-content">
           {typeof resultContent === 'string' ? (
-            <MarkdownRenderer content={resultContent.slice(0, 2000) + (resultContent.length > 2000 ? '\n\n...(内容已截断)' : '')} />
+            <MarkdownRenderer
+              content={
+                resultContent.slice(0, 2000) +
+                (resultContent.length > 2000 ? '\n\n...(内容已截断)' : '')
+              }
+            />
           ) : (
             <pre>{JSON.stringify(resultContent, null, 2).slice(0, 2000)}</pre>
           )}
@@ -801,9 +1094,7 @@ const ToolUseRenderer: React.FC<{ content: ContentItem; result?: ContentItem }> 
       <div className="ch-tool-header" onClick={() => setExpanded(!expanded)}>
         <span className="ch-tool-icon">{getToolIcon(content.name || '')}</span>
         <span className="ch-tool-name">{content.name || 'Tool'}</span>
-        {inputPreview && !expanded && (
-          <span className="ch-tool-preview">{inputPreview}</span>
-        )}
+        {inputPreview && !expanded && <span className="ch-tool-preview">{inputPreview}</span>}
         {/* 显示结果状态 */}
         {result && !expanded && (
           <span className={`ch-tool-status ${result.is_error ? 'error' : 'success'}`}>
@@ -812,7 +1103,12 @@ const ToolUseRenderer: React.FC<{ content: ContentItem; result?: ContentItem }> 
         )}
         <svg
           className={`ch-tool-chevron ${expanded ? 'expanded' : ''}`}
-          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
         >
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -821,9 +1117,7 @@ const ToolUseRenderer: React.FC<{ content: ContentItem; result?: ContentItem }> 
         <>
           {/* 工具输入参数 */}
           <div className="ch-tool-input">
-            <div className="ch-tool-section-label">
-              {isBashCommand ? '命令' : '参数'}
-            </div>
+            <div className="ch-tool-section-label">{isBashCommand ? '命令' : '参数'}</div>
             {isBashCommand && content.input?.command ? (
               <div className="ch-bash-command">
                 <span className="ch-bash-prompt">$</span>
@@ -847,7 +1141,14 @@ const McpToolRenderer: React.FC<{ content: ContentItem }> = ({ content }) => {
   return (
     <div className="ch-mcp-tool">
       <div className="ch-mcp-header" onClick={() => setExpanded(!expanded)}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M12 2L2 7l10 5 10-5-10-5z" />
           <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
         </svg>
@@ -882,7 +1183,9 @@ interface ContentEntry {
 }
 
 // 标准化工具执行条目，关联 tool_use 和 tool_result
-const normalizeToolExecutionEntries = (contents: ContentItem[]): (ToolExecutionEntry | ContentEntry)[] => {
+const normalizeToolExecutionEntries = (
+  contents: ContentItem[]
+): (ToolExecutionEntry | ContentEntry)[] => {
   const entries: (ToolExecutionEntry | ContentEntry)[] = []
   const pendingByToolId = new Map<string, number>()
 
@@ -894,7 +1197,7 @@ const normalizeToolExecutionEntries = (contents: ContentItem[]): (ToolExecutionE
         kind: 'item',
         key: `item-${index}`,
         item,
-        index,
+        index
       })
       continue
     }
@@ -904,7 +1207,7 @@ const normalizeToolExecutionEntries = (contents: ContentItem[]): (ToolExecutionE
         kind: 'toolExecution',
         key: `tool-${index}`,
         toolUse: item,
-        toolResults: [],
+        toolResults: []
       })
       pendingByToolId.set(item.id, entries.length - 1)
       continue
@@ -925,7 +1228,7 @@ const normalizeToolExecutionEntries = (contents: ContentItem[]): (ToolExecutionE
       kind: 'item',
       key: `item-${index}`,
       item,
-      index,
+      index
     })
   }
 
@@ -943,7 +1246,7 @@ const UnifiedToolExecutionRenderer: React.FC<{
   const toolInput = toolUse.input || {}
 
   const hasResult = toolResults.length > 0
-  const hasError = hasResult && toolResults.some(r => r.is_error)
+  const hasError = hasResult && toolResults.some((r) => r.is_error)
   const isPending = !hasResult
 
   // 获取主要预览
@@ -963,20 +1266,29 @@ const UnifiedToolExecutionRenderer: React.FC<{
       <div className="ch-tool-header" onClick={() => setExpanded(!expanded)}>
         <span className="ch-tool-icon">{getToolIcon(toolName)}</span>
         <span className="ch-tool-name">{toolName || 'Tool'}</span>
-        {primaryPreview && !expanded && (
-          <span className="ch-tool-preview">{primaryPreview}</span>
-        )}
+        {primaryPreview && !expanded && <span className="ch-tool-preview">{primaryPreview}</span>}
         {/* 状态指示器 */}
         {hasError ? (
-          <span className="ch-tool-status error"><ErrorIcon className="ch-status-icon" /></span>
+          <span className="ch-tool-status error">
+            <ErrorIcon className="ch-status-icon" />
+          </span>
         ) : isPending ? (
-          <span className="ch-tool-status" style={{ color: 'var(--ch-warning)' }}><PendingIcon className="ch-status-icon" /></span>
+          <span className="ch-tool-status" style={{ color: 'var(--ch-warning)' }}>
+            <PendingIcon className="ch-status-icon" />
+          </span>
         ) : (
-          <span className="ch-tool-status success"><SuccessIcon className="ch-status-icon" /></span>
+          <span className="ch-tool-status success">
+            <SuccessIcon className="ch-status-icon" />
+          </span>
         )}
         <svg
           className={`ch-tool-chevron ${expanded ? 'expanded' : ''}`}
-          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
         >
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -1011,14 +1323,25 @@ const UnifiedToolExecutionRenderer: React.FC<{
                   return (
                     <div key={idx} className={`ch-tool-result ${isError ? 'error' : 'success'}`}>
                       <div className="ch-tool-result-header">
-                        <span className="ch-tool-result-icon">{isError ? <ErrorIcon className="ch-result-icon" /> : <SuccessIcon className="ch-result-icon" />}</span>
+                        <span className="ch-tool-result-icon">
+                          {isError ? (
+                            <ErrorIcon className="ch-result-icon" />
+                          ) : (
+                            <SuccessIcon className="ch-result-icon" />
+                          )}
+                        </span>
                         <span className="ch-tool-result-label">
                           结果 #{idx + 1} {isError ? '(错误)' : '(完成)'}
                         </span>
                       </div>
                       <div className="ch-tool-result-content">
                         {typeof resultContent === 'string' ? (
-                          <MarkdownRenderer content={resultContent.slice(0, 5000) + (resultContent.length > 5000 ? '\n\n...(内容已截断)' : '')} />
+                          <MarkdownRenderer
+                            content={
+                              resultContent.slice(0, 5000) +
+                              (resultContent.length > 5000 ? '\n\n...(内容已截断)' : '')
+                            }
+                          />
                         ) : resultContent != null ? (
                           <pre>{JSON.stringify(resultContent, null, 2).slice(0, 5000)}</pre>
                         ) : (
@@ -1146,8 +1469,8 @@ const associateToolResultsAcrossMessages = (messages: ClaudeMessage[]): ClaudeMe
 
   // 应用修改并过滤消息
   return messages
-    .filter(msg => !messagesToRemove.has(msg.uuid))
-    .map(msg => {
+    .filter((msg) => !messagesToRemove.has(msg.uuid))
+    .map((msg) => {
       const additionalResults = toolResultsToAdd.get(msg.uuid)
       if (additionalResults && additionalResults.length > 0) {
         // 需要将 tool_result 添加到消息的 content 中
@@ -1196,7 +1519,7 @@ const MessageRenderer: React.FC<{ message: ClaudeMessage }> = ({ message }) => {
     // 数组内容：必须有实际内容项
     if (Array.isArray(content)) {
       // 先过滤掉 tool_result（它们应该在 tool_use 旁边显示，不应该作为独立消息）
-      const nonToolResultItems = content.filter(item => {
+      const nonToolResultItems = content.filter((item) => {
         if (!item) return false
         if (item.type === 'tool_result') return false
         return true
@@ -1208,7 +1531,7 @@ const MessageRenderer: React.FC<{ message: ClaudeMessage }> = ({ message }) => {
       }
 
       // 检查剩余项是否有实际内容
-      const nonEmptyItems = nonToolResultItems.filter(item => {
+      const nonEmptyItems = nonToolResultItems.filter((item) => {
         if (item.text?.trim()) return true
         if (item.thinking?.trim()) return true
         if (item.type === 'tool_use') return true
@@ -1225,9 +1548,7 @@ const MessageRenderer: React.FC<{ message: ClaudeMessage }> = ({ message }) => {
     if (!content) return false
     if (typeof content === 'string') return true
     if (Array.isArray(content)) {
-      return content.every(item =>
-        !item || item.type === 'text' || !item.type
-      )
+      return content.every((item) => !item || item.type === 'text' || !item.type)
     }
     return false
   }, [content])
@@ -1267,17 +1588,13 @@ const MessageRenderer: React.FC<{ message: ClaudeMessage }> = ({ message }) => {
             <MarkdownRenderer content={content} />
           ) : Array.isArray(content) ? (
             <>
-              {content.map((item, idx) => (
-                item.text ? (
-                  <MarkdownRenderer key={idx} content={item.text} />
-                ) : null
-              ))}
+              {content.map((item, idx) =>
+                item.text ? <MarkdownRenderer key={idx} content={item.text} /> : null
+              )}
             </>
           ) : null}
         </div>
-        <div className="ch-bubble-time">
-          {formatDateTime(message.timestamp)}
-        </div>
+        <div className="ch-bubble-time">{formatDateTime(message.timestamp)}</div>
       </div>
     )
   }
@@ -1316,13 +1633,15 @@ const MessageRenderer: React.FC<{ message: ClaudeMessage }> = ({ message }) => {
 
           {/* 折叠控制 */}
           {shouldAutoCollapse && (
-            <div
-              className="ch-message-toggle"
-              onClick={() => setExpanded(!expanded)}
-            >
+            <div className="ch-message-toggle" onClick={() => setExpanded(!expanded)}>
               <svg
                 className={`ch-tool-chevron ${isExpanded ? 'expanded' : ''}`}
-                width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
               >
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -1330,9 +1649,7 @@ const MessageRenderer: React.FC<{ message: ClaudeMessage }> = ({ message }) => {
             </div>
           )}
         </div>
-        <div className="ch-message-time">
-          {formatDateTime(message.timestamp)}
-        </div>
+        <div className="ch-message-time">{formatDateTime(message.timestamp)}</div>
       </div>
     </div>
   )
@@ -1368,14 +1685,28 @@ const FileEditItem: React.FC<{ edit: FileEdit }> = ({ edit }) => {
       <div className="ch-edit-header" onClick={() => setExpanded(!expanded)}>
         <div className="ch-edit-icon">
           {isNewFile ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
               <line x1="12" y1="18" x2="12" y2="12" />
               <line x1="9" y1="15" x2="15" y2="15" />
             </svg>
           ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
@@ -1388,9 +1719,7 @@ const FileEditItem: React.FC<{ edit: FileEdit }> = ({ edit }) => {
         </div>
 
         <div className="ch-edit-stats">
-          {linesAdded > 0 && (
-            <span className="ch-stat-added">+{linesAdded}</span>
-          )}
+          {linesAdded > 0 && <span className="ch-stat-added">+{linesAdded}</span>}
           {linesRemoved > 0 && !isNewFile && (
             <span className="ch-stat-removed">-{linesRemoved}</span>
           )}
@@ -1415,7 +1744,12 @@ const FileEditItem: React.FC<{ edit: FileEdit }> = ({ edit }) => {
 
         <svg
           className={`ch-edit-chevron ${expanded ? 'expanded' : ''}`}
-          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
         >
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -1475,9 +1809,10 @@ const RecentEditsViewer: React.FC<{ project: ClaudeProject }> = ({ project }) =>
   }, [project.encodedPath])
 
   const filteredEdits = searchQuery
-    ? edits.filter(edit =>
-        edit.path.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        edit.newContent.toLowerCase().includes(searchQuery.toLowerCase())
+    ? edits.filter(
+        (edit) =>
+          edit.path.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          edit.newContent.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : edits
 
@@ -1494,7 +1829,14 @@ const RecentEditsViewer: React.FC<{ project: ClaudeProject }> = ({ project }) =>
       {/* Header */}
       <div className="ch-edits-header">
         <div className="ch-edits-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
             <line x1="16" y1="13" x2="8" y2="13" />
@@ -1511,7 +1853,14 @@ const RecentEditsViewer: React.FC<{ project: ClaudeProject }> = ({ project }) =>
 
       {/* Search */}
       <div className="ch-edits-search">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
@@ -1519,7 +1868,7 @@ const RecentEditsViewer: React.FC<{ project: ClaudeProject }> = ({ project }) =>
           type="text"
           placeholder="搜索文件..."
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
@@ -1550,7 +1899,10 @@ const RecentEditsViewer: React.FC<{ project: ClaudeProject }> = ({ project }) =>
 // Session Board (Timeline View)
 // ============================================================================
 
-const SessionBoard: React.FC<{ project: ClaudeProject; onSessionClick: (session: ClaudeSession) => void }> = ({ project, onSessionClick }) => {
+const SessionBoard: React.FC<{
+  project: ClaudeProject
+  onSessionClick: (session: ClaudeSession) => void
+}> = ({ project, onSessionClick }) => {
   const [sessions, setSessions] = useState<ClaudeSession[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -1579,7 +1931,7 @@ const SessionBoard: React.FC<{ project: ClaudeProject; onSessionClick: (session:
 
   // Group sessions by date
   const sessionsByDate: Record<string, ClaudeSession[]> = {}
-  sessions.forEach(session => {
+  sessions.forEach((session) => {
     const date = session.lastMessageTime ? session.lastMessageTime.split('T')[0] : '未知日期'
     if (!sessionsByDate[date]) {
       sessionsByDate[date] = []
@@ -1594,7 +1946,14 @@ const SessionBoard: React.FC<{ project: ClaudeProject; onSessionClick: (session:
       {/* Header */}
       <div className="ch-board-header">
         <div className="ch-board-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
             <line x1="16" y1="2" x2="16" y2="6" />
             <line x1="8" y1="2" x2="8" y2="6" />
@@ -1609,14 +1968,14 @@ const SessionBoard: React.FC<{ project: ClaudeProject; onSessionClick: (session:
 
       {/* Timeline */}
       <div className="ch-timeline">
-        {sortedDates.map(date => (
+        {sortedDates.map((date) => (
           <div key={date} className="ch-timeline-group">
             <div className="ch-timeline-date">
               <span className="ch-date-label">{date}</span>
               <span className="ch-date-count">{sessionsByDate[date].length} 会话</span>
             </div>
             <div className="ch-timeline-sessions">
-              {sessionsByDate[date].map(session => (
+              {sessionsByDate[date].map((session) => (
                 <div key={session.id} className="ch-timeline-session">
                   <div className="ch-session-dot"></div>
                   <div
@@ -1624,9 +1983,7 @@ const SessionBoard: React.FC<{ project: ClaudeProject; onSessionClick: (session:
                     onClick={() => onSessionClick(session)}
                     title="点击查看会话详情"
                   >
-                    <div className="ch-session-title">
-                      {session.preview || '空会话'}
-                    </div>
+                    <div className="ch-session-title">{session.preview || '空会话'}</div>
                     <div className="ch-session-details">
                       <span>{session.messageCount} 条消息</span>
                       <span>{formatTime(session.lastModified)}</span>
@@ -1680,9 +2037,11 @@ const MetricCard: React.FC<{
 }
 
 // Token 分布环形图
-const TokenDistributionChart: React.FC<{ distribution: TokenDistribution }> = ({ distribution }) => {
-  const total = distribution.input + distribution.output +
-                distribution.cache_creation + distribution.cache_read
+const TokenDistributionChart: React.FC<{ distribution: TokenDistribution }> = ({
+  distribution
+}) => {
+  const total =
+    distribution.input + distribution.output + distribution.cache_creation + distribution.cache_read
 
   if (total === 0) {
     return <div className="ch-empty-chart">暂无数据</div>
@@ -1691,9 +2050,14 @@ const TokenDistributionChart: React.FC<{ distribution: TokenDistribution }> = ({
   const segments = [
     { key: 'input', label: '输入', value: distribution.input, color: '#007acc' },
     { key: 'output', label: '输出', value: distribution.output, color: '#89d185' },
-    { key: 'cache_creation', label: '缓存创建', value: distribution.cache_creation, color: '#cca700' },
+    {
+      key: 'cache_creation',
+      label: '缓存创建',
+      value: distribution.cache_creation,
+      color: '#cca700'
+    },
     { key: 'cache_read', label: '缓存读取', value: distribution.cache_read, color: '#b180d7' }
-  ].filter(s => s.value > 0)
+  ].filter((s) => s.value > 0)
 
   const radius = 70
   const circumference = 2 * Math.PI * radius
@@ -1731,7 +2095,7 @@ const TokenDistributionChart: React.FC<{ distribution: TokenDistribution }> = ({
         </div>
       </div>
       <div className="ch-chart-legend">
-        {segments.map(segment => (
+        {segments.map((segment) => (
           <div key={segment.key} className="ch-legend-item">
             <span className="ch-legend-color" style={{ backgroundColor: segment.color }} />
             <span className="ch-legend-label">{segment.label}</span>
@@ -1749,27 +2113,29 @@ const TokenDistributionChart: React.FC<{ distribution: TokenDistribution }> = ({
 const ActivityHeatmapChart: React.FC<{ data: ActivityHeatmap[] }> = ({ data }) => {
   const DAYS = ['日', '一', '二', '三', '四', '五', '六']
   const HOURS = Array.from({ length: 24 }, (_, i) => i)
-  const maxActivity = Math.max(...data.map(d => d.activity_count), 1)
+  const maxActivity = Math.max(...data.map((d) => d.activity_count), 1)
 
   const getHeatColor = (intensity: number): string => {
     if (intensity === 0) return '#1e1e1e'
-    const hue = 200 - (intensity * 160)
-    const lightness = 30 + (intensity * 20)
+    const hue = 200 - intensity * 160
+    const lightness = 30 + intensity * 20
     return `hsl(${hue}, 70%, ${lightness}%)`
   }
 
   return (
     <div className="ch-activity-heatmap">
       <div className="ch-heatmap-days">
-        {DAYS.map(day => (
-          <div key={day} className="ch-heatmap-day-label">{day}</div>
+        {DAYS.map((day) => (
+          <div key={day} className="ch-heatmap-day-label">
+            {day}
+          </div>
         ))}
       </div>
       <div className="ch-heatmap-grid">
         {DAYS.map((_, dayIndex) => (
           <div key={dayIndex} className="ch-heatmap-row">
-            {HOURS.map(hour => {
-              const activity = data.find(d => d.day === dayIndex && d.hour === hour)
+            {HOURS.map((hour) => {
+              const activity = data.find((d) => d.day === dayIndex && d.hour === hour)
               const count = activity?.activity_count || 0
               const intensity = count / maxActivity
 
@@ -1786,8 +2152,10 @@ const ActivityHeatmapChart: React.FC<{ data: ActivityHeatmap[] }> = ({ data }) =
         ))}
       </div>
       <div className="ch-heatmap-hours">
-        {HOURS.filter(h => h % 6 === 0).map(hour => (
-          <div key={hour} className="ch-heatmap-hour-label">{hour}:00</div>
+        {HOURS.filter((h) => h % 6 === 0).map((hour) => (
+          <div key={hour} className="ch-heatmap-hour-label">
+            {hour}:00
+          </div>
         ))}
       </div>
       <div className="ch-heatmap-legend">
@@ -1813,22 +2181,28 @@ const DailyTrendChart: React.FC<{ data: DailyStats[] }> = ({ data }) => {
     return <div className="ch-empty-chart">暂无趋势数据</div>
   }
 
-  const maxTokens = Math.max(...data.map(d => d.total_tokens), 1)
+  const maxTokens = Math.max(...data.map((d) => d.total_tokens), 1)
   const chartWidth = Math.max(data.length * 30, 300)
 
   return (
     <div className="ch-daily-trend">
-      <svg viewBox={`0 0 ${chartWidth} 150`} className="ch-trend-chart" preserveAspectRatio="xMidYMid meet">
+      <svg
+        viewBox={`0 0 ${chartWidth} 150`}
+        className="ch-trend-chart"
+        preserveAspectRatio="xMidYMid meet"
+      >
         {/* 折线 */}
         <polyline
           fill="none"
           stroke="#007acc"
           strokeWidth="2"
-          points={data.map((d, i) => {
-            const x = (i / Math.max(data.length - 1, 1)) * (chartWidth - 40) + 20
-            const y = 130 - (d.total_tokens / maxTokens) * 100
-            return `${x},${y}`
-          }).join(' ')}
+          points={data
+            .map((d, i) => {
+              const x = (i / Math.max(data.length - 1, 1)) * (chartWidth - 40) + 20
+              const y = 130 - (d.total_tokens / maxTokens) * 100
+              return `${x},${y}`
+            })
+            .join(' ')}
         />
         {/* 数据点 */}
         {data.map((d, i) => {
@@ -1887,7 +2261,7 @@ const AnalyticsDashboard: React.FC = () => {
     )
   }
 
-  const maxToolCount = Math.max(...stats.most_used_tools.map(t => t.usage_count), 1)
+  const maxToolCount = Math.max(...stats.most_used_tools.map((t) => t.usage_count), 1)
 
   return (
     <div className="ch-dashboard-content">
@@ -1924,7 +2298,7 @@ const AnalyticsDashboard: React.FC = () => {
         <div className="ch-chart-container">
           <div className="ch-chart-title">📅 时间跨度</div>
           <div style={{ color: 'var(--ch-text-secondary)', fontSize: '13px' }}>
-            {new Date(stats.date_range.first_message).toLocaleDateString('zh-CN')} - {' '}
+            {new Date(stats.date_range.first_message).toLocaleDateString('zh-CN')} -{' '}
             {stats.date_range.last_message
               ? new Date(stats.date_range.last_message).toLocaleDateString('zh-CN')
               : '现在'}
@@ -2023,13 +2397,20 @@ const FullScreenModal: React.FC<{
   return (
     <div className="ch-sidebar-overlay-container">
       <div className="ch-overlay-backdrop" onClick={onClose} />
-      <div className="ch-overlay-content" onClick={e => e.stopPropagation()}>
+      <div className="ch-overlay-content" onClick={(e) => e.stopPropagation()}>
         <div className="ch-modal-header">
           <h2>{title}</h2>
           <div className="ch-modal-actions">
             <span className="ch-modal-hint">按 ESC 关闭</span>
             <button className="ch-modal-close" onClick={onClose}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
@@ -2055,10 +2436,12 @@ const ClaudeHistory: React.FC<Props> = ({ onClose: _onClose }) => {
   const [selectedProject, setSelectedProject] = useState<ClaudeProject | null>(null)
   const [selectedSession, setSelectedSession] = useState<ClaudeSession | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<{
-    session: ClaudeSession
-    matchingMessages: ClaudeMessage[]
-  }[]>([])
+  const [searchResults, setSearchResults] = useState<
+    {
+      session: ClaudeSession
+      matchingMessages: ClaudeMessage[]
+    }[]
+  >([])
   const [isLoading, setIsLoading] = useState(false)
   const [isAvailable, setIsAvailable] = useState(false)
   const [activeTab, setActiveTab] = useState<MainTab>('history')
@@ -2084,7 +2467,8 @@ const ClaudeHistory: React.FC<Props> = ({ onClose: _onClose }) => {
     const unsubscribe = window.api.claudeHistory.onChanged(() => {
       if (activeTab === 'history') {
         if (viewMode === 'projects') loadProjects()
-        else if (viewMode === 'sessions' && selectedProject) loadSessions(selectedProject.encodedPath)
+        else if (viewMode === 'sessions' && selectedProject)
+          loadSessions(selectedProject.encodedPath)
       }
     })
     return unsubscribe
@@ -2160,7 +2544,11 @@ const ClaudeHistory: React.FC<Props> = ({ onClose: _onClose }) => {
       setViewMode('sessions')
       setMessages([])
       setSelectedSession(null)
-    } else if (viewMode === 'sessions' || viewMode === 'recentEdits' || viewMode === 'sessionBoard') {
+    } else if (
+      viewMode === 'sessions' ||
+      viewMode === 'recentEdits' ||
+      viewMode === 'sessionBoard'
+    ) {
       setViewMode('projects')
       setSessions([])
       setSelectedProject(null)
@@ -2212,10 +2600,15 @@ const ClaudeHistory: React.FC<Props> = ({ onClose: _onClose }) => {
           <div className="ch-sidebar">
             <div className="ch-sidebar-header">
               <h3>
-                {viewMode === 'projects' ? '项目列表' :
-                 viewMode === 'sessions' ? '会话列表' :
-                 viewMode === 'recentEdits' ? '最近编辑' :
-                 viewMode === 'sessionBoard' ? '会话面板' : '搜索结果'}
+                {viewMode === 'projects'
+                  ? '项目列表'
+                  : viewMode === 'sessions'
+                    ? '会话列表'
+                    : viewMode === 'recentEdits'
+                      ? '最近编辑'
+                      : viewMode === 'sessionBoard'
+                        ? '会话面板'
+                        : '搜索结果'}
               </h3>
               {viewMode !== 'projects' && (
                 <button
@@ -2258,8 +2651,8 @@ const ClaudeHistory: React.FC<Props> = ({ onClose: _onClose }) => {
                   className="ch-search-input"
                   placeholder="搜索对话..."
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   style={{ marginTop: '8px' }}
                 />
               )}
@@ -2273,7 +2666,7 @@ const ClaudeHistory: React.FC<Props> = ({ onClose: _onClose }) => {
               <>
                 {viewMode === 'projects' && (
                   <div className="ch-project-list">
-                    {projects.map(project => (
+                    {projects.map((project) => (
                       <div
                         key={project.encodedPath}
                         className={`ch-project-item ${selectedProject?.encodedPath === project.encodedPath ? 'active' : ''}`}
@@ -2298,15 +2691,13 @@ const ClaudeHistory: React.FC<Props> = ({ onClose: _onClose }) => {
 
                 {viewMode === 'sessions' && (
                   <div className="ch-session-list">
-                    {sessions.map(session => (
+                    {sessions.map((session) => (
                       <div
                         key={session.id}
                         className={`ch-session-item ${selectedSession?.id === session.id ? 'active' : ''}`}
                         onClick={() => handleSessionClick(session)}
                       >
-                        <div className="ch-session-preview">
-                          {session.preview || '空会话'}
-                        </div>
+                        <div className="ch-session-preview">{session.preview || '空会话'}</div>
                         <div className="ch-session-meta">
                           <span>{session.messageCount} 条消息</span>
                           <span>{formatTime(session.lastModified)}</span>
@@ -2324,7 +2715,7 @@ const ClaudeHistory: React.FC<Props> = ({ onClose: _onClose }) => {
 
                 {viewMode === 'search' && (
                   <div className="ch-session-list">
-                    {searchResults.map(result => (
+                    {searchResults.map((result) => (
                       <div
                         key={result.session.id}
                         className="ch-session-item"
@@ -2363,7 +2754,7 @@ const ClaudeHistory: React.FC<Props> = ({ onClose: _onClose }) => {
                 </div>
               ) : (
                 <div className="ch-message-list ch-fade-in">
-                  {associateToolResultsAcrossMessages(messages).map(msg => (
+                  {associateToolResultsAcrossMessages(messages).map((msg) => (
                     <MessageRenderer key={msg.uuid} message={msg} />
                   ))}
                 </div>

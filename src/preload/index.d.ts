@@ -27,7 +27,7 @@ export interface ClaudeSession {
   projectPath: string
   projectName: string
   jsonlPath: string
-  encodedProjectPath: string  // 用于加载消息
+  encodedProjectPath: string // 用于加载消息
   messageCount: number
   firstMessageTime: string | null
   lastMessageTime: string | null
@@ -185,36 +185,60 @@ export interface API {
     saveRoleSettings: (params: any) => Promise<boolean>
   }
   session: {
-    create: (sessionId: string, customPrompt?: string) => Promise<{ success: boolean; pid: number | null }>
+    create: (
+      sessionId: string,
+      customPrompt?: string
+    ) => Promise<{ success: boolean; pid: number | null }>
     input: (sessionId: string, data: string) => void
     resize: (sessionId: string, cols: number, rows: number) => void
     kill: (sessionId: string) => Promise<boolean>
     onIncoming: (callback: (sessionId: string, data: string) => void) => () => void
-    onExited: (callback: (sessionId: string, exitCode: number, signal: number) => void) => () => void
+    onExited: (
+      callback: (sessionId: string, exitCode: number, signal: number) => void
+    ) => () => void
   }
 
   claudeHistory: {
     detect: () => Promise<ClaudeHistoryProviderInfo>
     getProjects: () => Promise<ClaudeProject[]>
     getSessions: (encodedProjectPath: string) => Promise<ClaudeSession[]>
-    getMessages: (sessionId: string, encodedProjectPath: string, offset?: number, limit?: number) => Promise<{ messages: ClaudeMessage[]; total_count: number; has_more: boolean }>
+    getMessages: (
+      sessionId: string,
+      encodedProjectPath: string,
+      offset?: number,
+      limit?: number
+    ) => Promise<{ messages: ClaudeMessage[]; total_count: number; has_more: boolean }>
     search: (query: string, limit?: number) => Promise<ClaudeSearchResult[]>
-    getSessionStats: (sessionId: string, encodedProjectPath: string) => Promise<SessionTokenStats | null>
+    getSessionStats: (
+      sessionId: string,
+      encodedProjectPath: string
+    ) => Promise<SessionTokenStats | null>
     getProjectStats: (encodedProjectPath: string) => Promise<ProjectStatsSummary>
     getGlobalStats: () => Promise<GlobalStatsSummary>
-    getRecentEdits: (encodedProjectPath: string, limit?: number, offset?: number) => Promise<RecentEditsResult>
+    getRecentEdits: (
+      encodedProjectPath: string,
+      limit?: number,
+      offset?: number
+    ) => Promise<RecentEditsResult>
     getSessionEdits: (sessionId: string, encodedProjectPath: string) => Promise<FileEdit[]>
-    onChanged: (callback: (data: { event: string; path: string; timestamp: number }) => void) => () => void
+    onChanged: (
+      callback: (data: { event: string; path: string; timestamp: number }) => void
+    ) => () => void
     // Auto-sync methods
     findProjectByPath: (workspacePath: string) => Promise<ClaudeProject | null>
-    getAllProjectSummaries: () => Promise<Array<{
-      name: string
-      encodedPath: string
-      actualPath: string
-      sessionCount: number
-      lastModified: string
-    }>>
-    copyToWorkspace: (workspacePath: string, encodedProjectPath: string) => Promise<{
+    getAllProjectSummaries: () => Promise<
+      Array<{
+        name: string
+        encodedPath: string
+        actualPath: string
+        sessionCount: number
+        lastModified: string
+      }>
+    >
+    copyToWorkspace: (
+      workspacePath: string,
+      encodedProjectPath: string
+    ) => Promise<{
       success: boolean
       message: string
       copiedSessions: number

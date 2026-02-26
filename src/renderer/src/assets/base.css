@@ -96,7 +96,6 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--cc-accent-primary);
-  
 }
 
 ::-webkit-scrollbar-thumb:active {
@@ -126,7 +125,6 @@ body {
 
 /* Animations */
 @keyframes pulse-glow {
-
   0%,
   100% {
     opacity: 1;

@@ -8,20 +8,21 @@ For Chinese documentation, please see [README_CN.md](README_CN.md).
 
 Neuro-IDE aims to redefine the coding experience by embedding role-based AI workflows directly into the IDE. It provides context-aware terminals for different roles (Architect, Frontend, Backend), allowing developers to switch contexts effortlessly while maintaining state.
 
-## 📅 Status: Phase 3 Complete (MVP)
+## 📅 Status: Phase 4 - Integrated AI Workflows
 
 Start Date: Jan 2026
-Last Updated: Jan 2026
+Last Updated: Feb 26, 2026
 
 ### ✅ Key Features Implemented
 
 #### 1. The Core (Terminal System)
+
 - **Robust Electron Architecture**: Built on a type-safe foundation using Electron, Vite, and React.
 - **Native Terminal Integration**: Powered by `node-pty` for real system process management.
 - **High-Performance Rendering**: Utilizes `xterm.js` for a smooth, native-like terminal experience.
 - **Role-Based Sessions**: Supports multiple persistent terminal sessions (e.g., Architect, Frontend, Backend) with independent command history and state.
 - **Multi-Terminal Instances**: Each role can have multiple terminal tabs, allowing parallel command execution.
-- **Terminal Management**: 
+- **Terminal Management**:
   - Create unlimited terminal instances per role
   - Switch between terminals with intuitive tab interface
   - Rename terminals with inline editing
@@ -31,27 +32,36 @@ Last Updated: Jan 2026
 - **Copy/Paste Support**: Right-click paste and keyboard shortcuts (Ctrl/Cmd+C/V) in terminals
 
 #### 2. The Interface (Layout & Design)
+
 - **Flexible 3-Pane Layout**: Adjustable Sidebar, Main Panel (Markdown/Chat), and Stage Panel (Code Editor).
 - **Professional UI**: Dark theme inspired by VS Code, featuring SVG icons and a clean aesthetic.
 - **Markdown Studio**: Integrated dual-pane Markdown editor with real-time GitHub Flavored Markdown preview.
 - **Collapsible Panels**: Markdown editor can be collapsed to maximize terminal space.
 - **Terminal Tabs**: Clean tab interface for managing multiple terminal instances.
 
-#### 3. The Workspace (File & Project Management)
+#### 3. The AI Engine (Claude Code Integration)
+
+- **Claude History Browser**: Full integration with Claude Code history.
+  - **Project Auto-Detection**: Automatically identifies relevant Claude projects for the current workspace.
+  - **Conversation List**: Collapsible sidebar section for quick access to recent AI conversations.
+  - **Incremental Sync**: One-click synchronization of the latest Claude sessions to the workspace.
+  - **Rich Analytics**: Visualized token usage (Input, Output, Cache) and edited file trackers.
+  - **Overlay Modal**: Deep dive into full project histories without leaving the main workspace context.
+  - **Offline Persistence**: Optional storage of history data within the `.neuro` folder for fast loading.
+
+#### 4. The Workspace & Configuration
+
+- **Config Manager**: Centralized GUI for managing all IDE settings.
+  - **Role Editor**: Configure default commands, icons, and environment for each role.
+  - **Workspace Settings**: Per-project ignore patterns, auto-sync preferences, and terminal behaviors.
 - **Workspace Management**: Open and switch local directories, with automatic terminal session migration.
-- **Recent Workspaces**: 
-  - Quick access to recently opened workspaces via macOS Dock menu or Windows Jump List
-  - Displays up to 8 most recent workspaces with folder icons
-  - Persistent across application restarts
-  - Automatic workspace restoration on app launch
-  - Initial workspace selection prompt for first-time users
+- **Recent Workspaces**: Quick access to up to 8 recently opened folders via native OS menus or the Workspace Picker.
 - **Recursive File Tree**: Infinite nesting, automatic sorting, and real-time file watching via `chokidar`.
-- **Global Search**: Deep file search capability with filename prioritization, powered by recursive backend search.
-- **Monaco Editor Support**: Full-featured code editing (VS Code engine) with syntax highlighting for major languages.
-- **Custom Role Management**: Create, edit, and manage custom roles. Roles are saved globally, with per-workspace activation settings.
+- **Global Search**: Deep file search capability with filename prioritization.
+- **Monaco Editor Support**: Full-featured code editing (VS Code engine) with syntax highlighting and advanced features.
 - **Starred Files**: Quick access to frequently used files and folders with drag-to-reorder support.
-- **Changed Files Tracking**: Automatically tracks and lists modified files, with options to clear or add specific files to Starred list.
-- **Terminal Inactivity Monitor**: Configurable notifications for terminal inactivity, managed via Global Settings in Role Manager.
+- **Changed Files Tracking**: Automatically tracks modified files for easy review and starring.
+- **Terminal Activity Monitor**: Smart notifications for terminal output activity and idle states.
 
 ## 🛠 Tech Stack
 
@@ -100,9 +110,9 @@ $ npm run build:linux
 
 ## 🔜 Roadmap
 
-- [ ] **Multi-Tab Support**: Allow opening multiple files in the editor simultaneously.
-- [ ] **Git Integration**: Visual Git status indicators and basic version control operations.
-- [ ] **AI Engine Integration**: Connect the role-based terminals to actual LLM backends for autonomous coding assistance.
+- [ ] **Multi-Tab Editor**: Allow opening multiple files in the editor simultaneously with a tabbed interface.
+- [ ] **Direct AI Chat**: Integrated chat interface directly calling LLM APIs without external CLI dependencies.
+- [ ] **Plugin System**: Allow third-party extensions for custom roles and terminal enhancements.
 
 ---
 

@@ -1107,8 +1107,12 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
@@ -1164,7 +1168,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Empty State */
@@ -1720,16 +1726,24 @@
   font-weight: 600;
 }
 
-.ch-markdown-content h1 { font-size: 20px; }
-.ch-markdown-content h2 { font-size: 18px; }
-.ch-markdown-content h3 { font-size: 16px; }
-.ch-markdown-content h4 { font-size: 14px; }
+.ch-markdown-content h1 {
+  font-size: 20px;
+}
+.ch-markdown-content h2 {
+  font-size: 18px;
+}
+.ch-markdown-content h3 {
+  font-size: 16px;
+}
+.ch-markdown-content h4 {
+  font-size: 14px;
+}
 
 .ch-markdown-content p {
   margin: 8px 0;
 }
 
-.ch-markdown-content code:not([class*="language-"]) {
+.ch-markdown-content code:not([class*='language-']) {
   background: var(--ch-bg-tertiary);
   padding: 2px 6px;
   border-radius: 4px;
@@ -1956,10 +1970,18 @@
   border-radius: 12px;
 }
 
-.ch-metric-purple .ch-metric-icon { background: rgba(177, 128, 215, 0.2); }
-.ch-metric-blue .ch-metric-icon { background: rgba(0, 122, 204, 0.2); }
-.ch-metric-green .ch-metric-icon { background: rgba(137, 209, 133, 0.2); }
-.ch-metric-amber .ch-metric-icon { background: rgba(204, 167, 0, 0.2); }
+.ch-metric-purple .ch-metric-icon {
+  background: rgba(177, 128, 215, 0.2);
+}
+.ch-metric-blue .ch-metric-icon {
+  background: rgba(0, 122, 204, 0.2);
+}
+.ch-metric-green .ch-metric-icon {
+  background: rgba(137, 209, 133, 0.2);
+}
+.ch-metric-amber .ch-metric-icon {
+  background: rgba(204, 167, 0, 0.2);
+}
 
 .ch-metric-content {
   flex: 1;
@@ -1983,8 +2005,12 @@
   margin-top: 4px;
 }
 
-.ch-metric-trend.positive { color: var(--ch-success); }
-.ch-metric-trend.negative { color: var(--ch-error); }
+.ch-metric-trend.positive {
+  color: var(--ch-success);
+}
+.ch-metric-trend.negative {
+  color: var(--ch-error);
+}
 
 .ch-stats-grid-2col {
   display: grid;

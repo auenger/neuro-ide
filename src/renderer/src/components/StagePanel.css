@@ -1,160 +1,157 @@
 .stage-panel {
-    display: flex;
-    flex-direction: column;
-    background: var(--cc-bg-secondary);
+  display: flex;
+  flex-direction: column;
+  background: var(--cc-bg-secondary);
 }
 
 .stage-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--cc-border-primary);
-    background: var(--cc-bg-tertiary);
-    position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--cc-border-primary);
+  background: var(--cc-bg-tertiary);
+  position: relative;
 }
 
 .stage-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            var(--cc-warning) 50%,
-            transparent 100%);
-    opacity: 0.2;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--cc-warning) 50%, transparent 100%);
+  opacity: 0.2;
 }
 
 .stage-title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .stage-title h4 {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--cc-warning);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-family: var(--font-display);
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cc-warning);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: var(--font-display);
 }
 
 .file-info {
-    display: inline-flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
 }
 
 .file-modified {
-    color: var(--cc-accent-secondary);
-    font-size: 8px;
-    line-height: 1;
-    flex-shrink: 0;
-    animation: pulse-glow 2s ease-in-out infinite;
+  color: var(--cc-accent-secondary);
+  font-size: 8px;
+  line-height: 1;
+  flex-shrink: 0;
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .current-file {
-    font-size: 12px;
-    color: var(--cc-text-secondary);
-    font-weight: 500;
-    font-family: var(--font-mono);
-    line-height: 1;
+  font-size: 12px;
+  color: var(--cc-text-secondary);
+  font-weight: 500;
+  font-family: var(--font-mono);
+  line-height: 1;
 }
 
 .stage-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Save button - compact style */
 .save-btn {
-    background: transparent;
-    border: 1px solid var(--cc-border-secondary);
-    color: var(--cc-text-tertiary);
-    cursor: pointer;
-    padding: 6px 8px;
-    border-radius: 2px;
-    transition: all var(--transition-base);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
+  background: transparent;
+  border: 1px solid var(--cc-border-secondary);
+  color: var(--cc-text-tertiary);
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 2px;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .save-btn svg {
-    width: 12px;
-    height: 12px;
+  width: 12px;
+  height: 12px;
 }
 
 .save-btn span {
-    font-size: 10px;
-    font-weight: 600;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .save-btn:hover {
-    background: var(--cc-bg-elevated);
-    color: var(--cc-accent-primary);
-    border-color: var(--cc-accent-primary);
+  background: var(--cc-bg-elevated);
+  color: var(--cc-accent-primary);
+  border-color: var(--cc-accent-primary);
 }
 
 /* Has changes - red glow */
 .save-btn.has-changes {
-    color: var(--cc-error, #f85149);
-    border-color: var(--cc-error, #f85149);
-    animation: pulse-glow 1.5s ease-in-out infinite;
+  color: var(--cc-error, #f85149);
+  border-color: var(--cc-error, #f85149);
+  animation: pulse-glow 1.5s ease-in-out infinite;
 }
 
 .save-btn.has-changes:hover {
-    background: var(--cc-bg-elevated);
-    color: var(--cc-error, #f85149);
-    border-color: var(--cc-error, #f85149);
+  background: var(--cc-bg-elevated);
+  color: var(--cc-error, #f85149);
+  border-color: var(--cc-error, #f85149);
 }
 
 .stage-content {
-    flex: 1;
-    overflow: hidden;
-    background: var(--cc-bg-primary);
+  flex: 1;
+  overflow: hidden;
+  background: var(--cc-bg-primary);
 }
 
 .placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--cc-text-tertiary);
-    text-align: center;
-    padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--cc-text-tertiary);
+  text-align: center;
+  padding: 40px;
 }
 
 .placeholder-icon {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 20px;
-    opacity: 0.3;
-    stroke-width: 1.5;
-    color: var(--cc-accent-secondary);
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  opacity: 0.3;
+  stroke-width: 1.5;
+  color: var(--cc-accent-secondary);
 }
 
 .placeholder p {
-    margin: 10px 0;
-    font-size: 14px;
-    color: var(--cc-text-secondary);
-    font-family: var(--font-mono);
+  margin: 10px 0;
+  font-size: 14px;
+  color: var(--cc-text-secondary);
+  font-family: var(--font-mono);
 }
 
 .placeholder-hint {
-    font-size: 12px;
-    color: var(--cc-text-muted);
-    font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--cc-text-muted);
+  font-family: var(--font-mono);
 }

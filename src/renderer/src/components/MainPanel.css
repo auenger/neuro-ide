@@ -1,430 +1,428 @@
 .main-panel {
-    border-right: 1px solid var(--cc-border-primary);
-    background: var(--cc-bg-secondary);
+  border-right: 1px solid var(--cc-border-primary);
+  background: var(--cc-bg-secondary);
 }
 
 .resize-handle-horizontal {
-    height: 4px;
-    background: var(--cc-border-primary);
-    cursor: row-resize;
-    transition: all var(--transition-base);
-    position: relative;
+  height: 4px;
+  background: var(--cc-border-primary);
+  cursor: row-resize;
+  transition: all var(--transition-base);
+  position: relative;
 }
 
 .resize-handle-horizontal::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 1px;
-    background: var(--cc-border-secondary);
-    opacity: 0;
-    transition: opacity var(--transition-base);
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1px;
+  background: var(--cc-border-secondary);
+  opacity: 0;
+  transition: opacity var(--transition-base);
 }
 
 .resize-handle-horizontal:hover {
-    background: var(--cc-accent-primary);
-
+  background: var(--cc-accent-primary);
 }
 
 .resize-handle-horizontal:hover::after {
-    opacity: 1;
-    background: var(--cc-accent-primary);
-
+  opacity: 1;
+  background: var(--cc-accent-primary);
 }
 
 .resize-handle-horizontal:active {
-    background: var(--cc-accent-secondary);
-
+  background: var(--cc-accent-secondary);
 }
 
 /* Markdown Panel */
 .markdown-panel {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background: var(--cc-bg-secondary);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--cc-bg-secondary);
 }
 
 .markdown-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--cc-border-primary);
-    background: var(--cc-bg-tertiary);
-    position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--cc-border-primary);
+  background: var(--cc-bg-tertiary);
+  position: relative;
 }
 
 .markdown-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            var(--cc-accent-secondary) 50%,
-            transparent 100%);
-    opacity: 0.2;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--cc-accent-secondary) 50%,
+    transparent 100%
+  );
+  opacity: 0.2;
 }
 
 .markdown-header h4 {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--cc-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-family: var(--font-display);
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cc-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: var(--font-display);
 }
 
 .markdown-editor-container {
-    flex: 1;
-    overflow: hidden;
-    transition: all var(--transition-base);
+  flex: 1;
+  overflow: hidden;
+  transition: all var(--transition-base);
 }
 
 .markdown-editor-container.hidden {
-    display: none;
+  display: none;
 }
 
 .collapse-btn,
 .expand-btn {
-    background: transparent;
-    border: 1px solid var(--cc-border-secondary);
-    color: var(--cc-text-tertiary);
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 2px;
-    transition: all var(--transition-base);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: transparent;
+  border: 1px solid var(--cc-border-secondary);
+  color: var(--cc-text-tertiary);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 2px;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .collapse-btn svg,
 .expand-btn svg {
-    width: 14px;
-    height: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 .collapse-btn:hover,
 .expand-btn:hover {
-    background: var(--cc-bg-elevated);
-    color: var(--cc-accent-primary);
-    border-color: var(--cc-accent-primary);
-
+  background: var(--cc-bg-elevated);
+  color: var(--cc-accent-primary);
+  border-color: var(--cc-accent-primary);
 }
 
 .collapse-btn:active,
 .expand-btn:active {
-    background: var(--cc-accent-primary);
-    color: var(--cc-bg-primary);
+  background: var(--cc-accent-primary);
+  color: var(--cc-bg-primary);
 }
 
 /* Chat Console */
 .chat-console {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background: var(--cc-bg-secondary);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--cc-bg-secondary);
 }
 
 .chat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--cc-border-primary);
-    background: var(--cc-bg-tertiary);
-    position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--cc-border-primary);
+  background: var(--cc-bg-tertiary);
+  position: relative;
 }
 
 .chat-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg,
-            transparent 0%,
-            var(--cc-accent-primary) 50%,
-            transparent 100%);
-    opacity: 0.2;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--cc-accent-primary) 50%,
+    transparent 100%
+  );
+  opacity: 0.2;
 }
 
 .header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .chat-header h4 {
-    margin: 0;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--cc-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-family: var(--font-display);
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cc-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: var(--font-display);
 }
 
 .terminal-controls {
-    display: flex;
-    gap: 6px;
+  display: flex;
+  gap: 6px;
 }
 
 .control-btn {
-    background: transparent;
-    border: 1px solid var(--cc-border-secondary);
-    color: var(--cc-text-tertiary);
-    cursor: pointer;
-    padding: 6px 8px;
-    border-radius: 2px;
-    transition: all var(--transition-base);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: transparent;
+  border: 1px solid var(--cc-border-secondary);
+  color: var(--cc-text-tertiary);
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 2px;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .control-btn svg {
-    width: 14px;
-    height: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 .control-btn:hover {
-    background: var(--cc-bg-elevated);
-    color: var(--cc-accent-primary);
-    border-color: var(--cc-accent-primary);
-
+  background: var(--cc-bg-elevated);
+  color: var(--cc-accent-primary);
+  border-color: var(--cc-accent-primary);
 }
 
 .control-btn:active {
-    background: var(--cc-accent-primary);
-    color: var(--cc-bg-primary);
+  background: var(--cc-accent-primary);
+  color: var(--cc-bg-primary);
 }
 
 /* Terminal Tabs */
 .terminal-tabs {
-    background: var(--cc-bg-secondary);
-    border-bottom: 1px solid var(--cc-border-primary);
-    padding: 0 8px;
+  background: var(--cc-bg-secondary);
+  border-bottom: 1px solid var(--cc-border-primary);
+  padding: 0 8px;
 }
 
 .tabs-list {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    overflow-x: auto;
-    scrollbar-width: thin;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .tabs-list::-webkit-scrollbar {
-    height: 4px;
+  height: 4px;
 }
 
 .tabs-list::-webkit-scrollbar-thumb {
-    background: var(--cc-border-secondary);
-    border-radius: 0;
+  background: var(--cc-border-secondary);
+  border-radius: 0;
 }
 
 .terminal-tab {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    background: transparent;
-    border: none;
-    color: var(--cc-text-tertiary);
-    cursor: pointer;
-    font-size: 12px;
-    border-top: 2px solid transparent;
-    transition: all var(--transition-base);
-    white-space: nowrap;
-    font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: var(--cc-text-tertiary);
+  cursor: pointer;
+  font-size: 12px;
+  border-top: 2px solid transparent;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  font-family: var(--font-mono);
 }
 
 .terminal-tab:hover {
-    background: var(--cc-bg-elevated);
-    color: var(--cc-text-primary);
+  background: var(--cc-bg-elevated);
+  color: var(--cc-text-primary);
 }
 
 .terminal-tab.active {
-    background: var(--cc-bg-tertiary);
-    color: var(--cc-accent-primary);
-    border-top-color: var(--cc-accent-primary);
-    box-shadow: inset 0 1px 0 0 var(--cc-accent-primary);
+  background: var(--cc-bg-tertiary);
+  color: var(--cc-accent-primary);
+  border-top-color: var(--cc-accent-primary);
+  box-shadow: inset 0 1px 0 0 var(--cc-accent-primary);
 }
 
 .tab-name {
-    user-select: none;
-    font-weight: 500;
+  user-select: none;
+  font-weight: 500;
 }
 
 .tab-close {
-    background: transparent;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    padding: 2px;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.5;
-    transition: all var(--transition-fast);
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  transition: all var(--transition-fast);
 }
 
 .tab-close svg {
-    width: 12px;
-    height: 12px;
+  width: 12px;
+  height: 12px;
 }
 
 .tab-close:hover {
-    background: var(--cc-error);
-    color: var(--cc-bg-primary);
-    opacity: 1;
+  background: var(--cc-error);
+  color: var(--cc-bg-primary);
+  opacity: 1;
 }
 
 .tab-edit {
-    background: transparent;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    padding: 2px;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: all var(--transition-fast);
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all var(--transition-fast);
 }
 
 .tab-edit svg {
-    width: 12px;
-    height: 12px;
+  width: 12px;
+  height: 12px;
 }
 
 .terminal-tab:hover .tab-edit {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 .tab-edit:hover {
-    background: var(--cc-bg-elevated);
-    opacity: 1 !important;
-    color: var(--cc-accent-secondary);
+  background: var(--cc-bg-elevated);
+  opacity: 1 !important;
+  color: var(--cc-accent-secondary);
 }
 
 .add-terminal-btn {
-    background: transparent;
-    border: none;
-    color: var(--cc-text-tertiary);
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-base);
-    margin-left: 4px;
+  background: transparent;
+  border: none;
+  color: var(--cc-text-tertiary);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  margin-left: 4px;
 }
 
 .add-terminal-btn svg {
-    width: 14px;
-    height: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 .add-terminal-btn:hover {
-    background: var(--cc-bg-elevated);
-    color: var(--cc-accent-primary);
+  background: var(--cc-bg-elevated);
+  color: var(--cc-accent-primary);
 }
 
 .add-terminal-btn:active {
-    background: var(--cc-accent-primary);
-    color: var(--cc-bg-primary);
+  background: var(--cc-accent-primary);
+  color: var(--cc-bg-primary);
 }
 
 .tab-name-input {
-    background: var(--cc-bg-elevated);
-    border: 1px solid var(--cc-accent-primary);
-    color: var(--cc-text-primary);
-    padding: 4px 8px;
-    border-radius: 2px;
-    font-size: 12px;
-    font-family: var(--font-mono);
-    outline: none;
-    min-width: 100px;
-    max-width: 180px;
-
+  background: var(--cc-bg-elevated);
+  border: 1px solid var(--cc-accent-primary);
+  color: var(--cc-text-primary);
+  padding: 4px 8px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  outline: none;
+  min-width: 100px;
+  max-width: 180px;
 }
 
 .tab-name-input:focus {
-    border-color: var(--cc-accent-secondary);
-    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
+  border-color: var(--cc-accent-secondary);
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
 }
 
 /* Layout Toggle Button */
 .layout-toggle-btn {
-    position: relative;
+  position: relative;
 }
 
 /* Grid Config Dropdown */
 .grid-config-wrapper {
-    position: relative;
+  position: relative;
 }
 
 .grid-config-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
 }
 
 .grid-config-label {
-    font-size: 11px;
-    font-weight: 600;
-    font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
 }
 
 .grid-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 4px;
-    background: var(--cc-bg-elevated);
-    border: 1px solid var(--cc-border-primary);
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 100;
-    min-width: 80px;
-    overflow: hidden;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--cc-bg-elevated);
+  border: 1px solid var(--cc-border-primary);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  min-width: 80px;
+  overflow: hidden;
 }
 
 .grid-dropdown-item {
-    display: block;
-    width: 100%;
-    padding: 8px 12px;
-    background: transparent;
-    border: none;
-    color: var(--cc-text-secondary);
-    font-size: 12px;
-    font-family: var(--font-mono);
-    text-align: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: var(--cc-text-secondary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
 .grid-dropdown-item:hover {
-    background: var(--cc-bg-tertiary);
-    color: var(--cc-text-primary);
+  background: var(--cc-bg-tertiary);
+  color: var(--cc-text-primary);
 }
 
 .grid-dropdown-item.active {
-    background: var(--cc-accent-primary);
-    color: var(--cc-bg-primary);
+  background: var(--cc-accent-primary);
+  color: var(--cc-bg-primary);
 }

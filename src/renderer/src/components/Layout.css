@@ -41,6 +41,20 @@
   background: var(--cc-accent-secondary);
 }
 
+/* Disabled resize handle */
+.resize-handle.disabled,
+.resize-handle:disabled {
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.resize-handle.disabled::before,
+.resize-handle:disabled::before {
+  display: none;
+}
+
 /* Panel base styles */
 .panel-base {
   height: 100%;

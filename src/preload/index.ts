@@ -17,17 +17,19 @@ const api = {
   fs: {
     readDir: (dirPath: string) => ipcRenderer.invoke('fs:readDir', dirPath),
     readFile: (filePath: string) => ipcRenderer.invoke('fs:readFile', filePath),
-    writeFile: (filePath: string, content: string) => ipcRenderer.invoke('fs:writeFile', filePath, content),
-    onFileChanged: (callback: (data: {
-      event: string;
-      path: string;
-      timestamp?: number
-    }) => void) => {
-      const handler = (_: any, payload: {
-        event: string;
-        path: string;
-        timestamp?: number
-      }) => {
+    writeFile: (filePath: string, content: string) =>
+      ipcRenderer.invoke('fs:writeFile', filePath, content),
+    onFileChanged: (
+      callback: (data: { event: string; path: string; timestamp?: number }) => void
+    ) => {
+      const handler = (
+        _: any,
+        payload: {
+          event: string
+          path: string
+          timestamp?: number
+        }
+      ) => {
         callback(payload)
       }
       ipcRenderer.on('file:changed', handler)
@@ -50,8 +52,10 @@ const api = {
 
   // Session management
   session: {
-    create: (sessionId: string, customPrompt?: string) => ipcRenderer.invoke('session:create', sessionId, customPrompt),
-    input: (sessionId: string, data: string) => ipcRenderer.send('session:input', { sessionId, data }),
+    create: (sessionId: string, customPrompt?: string) =>
+      ipcRenderer.invoke('session:create', sessionId, customPrompt),
+    input: (sessionId: string, data: string) =>
+      ipcRenderer.send('session:input', { sessionId, data }),
     resize: (sessionId: string, cols: number, rows: number) =>
       ipcRenderer.send('session:resize', { sessionId, cols, rows }),
     kill: (sessionId: string) => ipcRenderer.invoke('session:kill', sessionId),
@@ -63,7 +67,10 @@ const api = {
       return () => ipcRenderer.removeListener('terminal:incoming', handler)
     },
     onExited: (callback: (sessionId: string, exitCode: number, signal: number) => void) => {
-      const handler = (_: any, payload: { sessionId: string; exitCode: number; signal: number }) => {
+      const handler = (
+        _: any,
+        payload: { sessionId: string; exitCode: number; signal: number }
+      ) => {
         callback(payload.sessionId, payload.exitCode, payload.signal)
       }
       ipcRenderer.on('session:exited', handler)
@@ -78,7 +85,13 @@ const api = {
     getSessions: (encodedProjectPath: string) =>
       ipcRenderer.invoke('claude-history:getSessions', encodedProjectPath),
     getMessages: (sessionId: string, encodedProjectPath: string, offset?: number, limit?: number) =>
-      ipcRenderer.invoke('claude-history:getMessages', sessionId, encodedProjectPath, offset, limit),
+      ipcRenderer.invoke(
+        'claude-history:getMessages',
+        sessionId,
+        encodedProjectPath,
+        offset,
+        limit
+      ),
     search: (query: string, limit?: number) =>
       ipcRenderer.invoke('claude-history:search', query, limit),
     getSessionStats: (sessionId: string, encodedProjectPath: string) =>
@@ -100,15 +113,13 @@ const api = {
     // Auto-sync methods
     findProjectByPath: (workspacePath: string) =>
       ipcRenderer.invoke('claude-history:findProjectByPath', workspacePath),
-    getAllProjectSummaries: () =>
-      ipcRenderer.invoke('claude-history:getAllProjectSummaries'),
+    getAllProjectSummaries: () => ipcRenderer.invoke('claude-history:getAllProjectSummaries'),
     copyToWorkspace: (workspacePath: string, encodedProjectPath: string) =>
       ipcRenderer.invoke('claude-history:copyToWorkspace', workspacePath, encodedProjectPath),
     getWorkspaceHistory: (workspacePath: string) =>
       ipcRenderer.invoke('claude-history:getWorkspaceHistory', workspacePath),
     // Deleted sessions management
-    getDeletedSessions: () =>
-      ipcRenderer.invoke('claude-history:getDeletedSessions'),
+    getDeletedSessions: () => ipcRenderer.invoke('claude-history:getDeletedSessions'),
     getDeletedSessionsForProject: (encodedProjectPath: string) =>
       ipcRenderer.invoke('claude-history:getDeletedSessionsForProject', encodedProjectPath),
     markSessionDeleted: (encodedProjectPath: string, sessionId: string) =>
