@@ -10,4 +10,5 @@ docs
 reference
 tsconfig.node.tsbuildinfo
 _bmad-output
-.claude
+.claude.vscode
+build

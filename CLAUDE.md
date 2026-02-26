@@ -6,7 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Neuro-IDE** is an AI-assisted IDE built with Electron, React, and TypeScript. It features a three-pane layout integrating multi-role terminal sessions, code editing, and Markdown previewing. The unique selling point is role-based terminal sessions - each role (Architect, Frontend, Backend) maintains independent terminal state with custom prompts.
 
-**Status**: Phase 3 Complete (MVP) - Started: Jan 2026, Last Updated: Feb 2026
+**Status**: Phase 4 - Integrated AI Workflows (Current Focal Point)
+**Updated**: Feb 26, 2026
 
 ## Code Style
 
@@ -62,6 +63,7 @@ src/
 ### Main Process (`src/main/index.ts`)
 
 **Key Classes**:
+
 - `SessionManager` - Manages `node-pty` terminal sessions, one per role/terminal instance
 - `FileWatcher` - Wraps `chokidar` for real-time file change monitoring
 - `ConfigManager` - Handles JSON config persistence (roles, settings, starred files)
@@ -75,11 +77,17 @@ src/
 - `workspace:select` - Directory picker dialog
 - `dialog:openDirectory` - Generic directory selection
 - `fs:readDir`, `fs:readFile`, `fs:writeFile`, `fs:searchInWorkspace` - File operations
-- `config:load`, `config:save`, `config:loadRoleSettings`, `config:saveRoleSettings` - Configuration
+- `config:load`, `config:save`, `config:loadRoleSettings`, `config:saveRoleSettings` - Configuration Persistence
+- `fileWatcher:setIgnoredDirectories` - Dynamic update of watcher exclude patterns
 - `session:create`, `session:input`, `session:resize`, `session:kill` - Terminal control
-- `claude-history:*` - Claude analytics (detect, getProjects, getSessions, getMessages, search, stats)
+- `claude-history:detect`, `claude-history:getProjects`, `claude-history:getSessions`, `claude-history:getMessages` - Core History access
+- `claude-history:search`, `claude-history:getSessionStats`, `claude-history:getProjectStats`, `claude-history:getGlobalStats` - Analytics
+- `claude-history:getRecentEdits`, `claude-history:getSessionEdits` - File tracking integration
+- `claude-history:findProjectByPath`, `claude-history:getAllProjectSummaries`, `claude-history:copyToWorkspace`, `claude-history:getWorkspaceHistory` - Workspace Auto-Sync
+- `claude-history:getDeletedSessions`, `claude-history:markSessionDeleted`, `claude-history:restoreSession` - Trash/Cleanup logic
 
 **Important Events**:
+
 - `workspace:opened` - Sent to renderer when workspace is applied
 - `file:changed` - File watcher events (add, change, unlink)
 - `terminal:incoming` - Terminal output from pty
@@ -89,6 +97,7 @@ src/
 **State Management**: Zustand store at `src/renderer/src/store/appStore.ts`
 
 Key state slices:
+
 - `roles` - Global role definitions (architect, frontend, backend, custom)
 - `sessions` - Active terminal sessions with multiple terminal instances per role
 - `workspacePath` - Current workspace directory
@@ -97,6 +106,7 @@ Key state slices:
 - `starredItems` - Quick access files with drag-to-reorder
 
 **Three-Pane Layout** (`react-resizable-panels`):
+
 1. **Sidebar (20%)** - Role switcher + file tree + starred files + changed files
 2. **MainPanel (45%)** - Markdown editor (top) + Chat console (bottom)
 3. **StagePanel (35%)** - Monaco editor or diff view
@@ -104,6 +114,7 @@ Key state slices:
 ### Preload Bridge (`src/preload/`)
 
 Exposes secure APIs to renderer via `contextBridge`:
+
 - `window.api.workspace` - Workspace selection
 - `window.api.fs` - File system operations
 - `window.api.config` - Configuration persistence
@@ -112,36 +123,43 @@ Exposes secure APIs to renderer via `contextBridge`:
 ## Configuration Storage
 
 **Global Config** (workspace-independent):
+
 - Location: `~/.neuro-ide-global/`
 - Files: `roles.json`, `recent-workspaces.json`, `current-workspace.json`
 
 **Workspace Config** (per-workspace):
+
 - Location: `<workspace>/.neuro/`
 - Files: `starred.json`, `role-settings.json`, `settings.json`
 
 **Role Settings Pattern**:
+
 - Role definitions are **global** (shared across all workspaces)
 - Role activation status is **per-workspace** (which roles are active)
 
 ## Key Patterns & Conventions
 
 ### Terminal Session Model
+
 - Each `Session` represents a **role** with multiple `TerminalInstance` children
 - Terminal IDs format: `{roleId}-terminal-{index}-{timestamp}`
 - Minimum one terminal per session (can't close the last terminal)
 - Sessions are only created for **active** roles
 
 ### File Watching
+
 - Uses `chokidar` with smart ignores (node_modules, .git, build dirs, hidden files except .neuro)
 - Emits `file:changed` events to renderer
 - Triggers file tree refreshes and changed file tracking
 
 ### Workspace Switching
+
 - When workspace changes: `workspaceChangeCounter` increments, triggering terminal recreation
 - Terminal sessions are killed and recreated with new working directory
 - File watcher restarts with new directory
 
 ### Terminal Custom Prompts
+
 - Unix only (macOS/Linux) - Windows uses default PowerShell
 - Set via `customPrompt` field on `RoleConfig`
 - Injected as `PS1` environment variable
@@ -149,9 +167,11 @@ Exposes secure APIs to renderer via `contextBridge`:
 ## Important Technical Details
 
 ### Claude History Service
+
 The `claudeHistoryService` in `src/main/claudeHistory.ts` provides comprehensive analytics for Claude Code usage:
 
 **Features**:
+
 - Detects Claude Code installation and history directory
 - Reads Claude's JSONL session files
 - Provides project/session/message hierarchy
@@ -160,6 +180,7 @@ The `claudeHistoryService` in `src/main/claudeHistory.ts` provides comprehensive
 - Real-time file watching for new sessions/messages
 
 **IPC Handlers** (`claude-history:*`):
+
 - `detect` - Check if Claude Code is installed
 - `getProjects` - List all projects with session counts
 - `getSessions` - Get sessions for a specific project
@@ -171,26 +192,31 @@ The `claudeHistoryService` in `src/main/claudeHistory.ts` provides comprehensive
 - `getRecentEdits` - Files recently edited via Claude
 
 **Data Flow**:
+
 1. Claude Code stores sessions in `~/claude-history/<encoded-project-path>/<session-id>.jsonl`
 2. Each line is a JSON message with type, content, timestamps, tokens
 3. Service parses these into structured types for UI consumption
 
 ### Platform-Specific Behavior
+
 - **Windows**: Uses PowerShell, ignores custom prompts
 - **macOS**: Dock menu shows recent workspaces (max 8)
 - **Linux**: No native recent workspaces menu
 
 ### Terminal Activity Monitor
+
 - Optional notification system for inactive terminals
 - Configurable threshold (default 2000ms)
 - Settings persisted per-workspace in `settings.json`
 
 ### Monaco Editor Integration
+
 - Full VS Code editor engine
 - Supports diff view mode
 - Used for all code editing in StagePanel
 
 ### Global Search
+
 - Backend-powered recursive search via `fs:searchInWorkspace`
 - Filename matches prioritized (marked with `isFilenameMatch: true`)
 - Max 1000 results to prevent performance issues
@@ -198,7 +224,9 @@ The `claudeHistoryService` in `src/main/claudeHistory.ts` provides comprehensive
 ## Common Modifications
 
 ### Adding a New Role
+
 Roles are stored globally. Use the RoleManager UI or modify `~/.neuro-ide-global/roles.json`:
+
 ```json
 {
   "id": "custom-role",
@@ -212,12 +240,15 @@ Roles are stored globally. Use the RoleManager UI or modify `~/.neuro-ide-global
 ```
 
 ### Modifying Terminal Shell
+
 Edit `src/main/index.ts` in `SessionManager` constructor - default shell detection logic.
 
 ### Changing Panel Sizes
+
 Edit `src/renderer/src/components/Layout.tsx` - `defaultSize`, `minSize`, `maxSize` props on `<Panel>` components.
 
 ### Adding File Watcher Ignores
+
 Edit `src/main/index.ts` in `FileWatcher.watch()` - add patterns to the `ignored` callback.
 
 ## Testing Considerations
@@ -234,6 +265,7 @@ Edit `src/main/index.ts` in `FileWatcher.watch()` - add patterns to the `ignored
 ## Renderer Component Structure
 
 **Main Components** (`src/renderer/src/components/`):
+
 - `Layout.tsx` - Root layout with `react-resizable-panels`
 - `Sidebar.tsx` - Role switcher, file tree, starred files
 - `MainPanel.tsx` - Markdown editor + chat console
@@ -247,7 +279,9 @@ Edit `src/main/index.ts` in `FileWatcher.watch()` - add patterns to the `ignored
 - `TerminalActivityMonitor.tsx` - Inactivity notifications
 
 **Utils** (`src/renderer/src/utils/`):
+
 - `icons.tsx` - Icon component helpers
 
 **State** (`src/renderer/src/store/`):
+
 - `appStore.ts` - Zustand store with all app state
