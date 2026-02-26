@@ -22,6 +22,9 @@ Last Updated: Feb 26, 2026
 - **High-Performance Rendering**: Utilizes `xterm.js` for a smooth, native-like terminal experience.
 - **Role-Based Sessions**: Supports multiple persistent terminal sessions (e.g., Architect, Frontend, Backend) with independent command history and state.
 - **Multi-Terminal Instances**: Each role can have multiple terminal tabs, allowing parallel command execution.
+
+![Multi Terminal](public/multiTerm.png)
+
 - **Terminal Management**:
   - Create unlimited terminal instances per role
   - Switch between terminals with intuitive tab interface
@@ -40,6 +43,8 @@ Last Updated: Feb 26, 2026
 - **Terminal Tabs**: Clean tab interface for managing multiple terminal instances.
 
 #### 3. The AI Engine (Claude Code Integration)
+
+![Claude History](public/chathistory.png)
 
 - **Claude History Browser**: Full integration with Claude Code history.
   - **Project Auto-Detection**: Automatically identifies relevant Claude projects for the current workspace.
@@ -61,7 +66,12 @@ Last Updated: Feb 26, 2026
 - **Monaco Editor Support**: Full-featured code editing (VS Code engine) with syntax highlighting and advanced features.
 - **Starred Files**: Quick access to frequently used files and folders with drag-to-reorder support.
 - **Changed Files Tracking**: Automatically tracks modified files for easy review and starring.
+
+![File Changes](public/fileChange.png)
+
 - **Terminal Activity Monitor**: Smart notifications for terminal output activity and idle states.
+
+![Activity Monitor](public/TerminalActivityMonitor.png)
 
 ## 🛠 Tech Stack
 
