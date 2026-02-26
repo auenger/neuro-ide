@@ -357,7 +357,14 @@ export class ClaudeHistoryService {
   private mainWindow: BrowserWindow | null = null
 
   constructor() {
-    const homeDir = app.getPath('home') || process.env.HOME || process.env.USERPROFILE || ''
+    let homeDir: string
+    if (process.platform === 'win32') {
+      // Windows: 优先使用 USERPROFILE 环境变量，避免打包后路径问题
+      homeDir = process.env.USERPROFILE || app.getPath('home') || process.env.HOME || ''
+    } else {
+      // macOS/Linux: 保持原有逻辑
+      homeDir = app.getPath('home') || process.env.HOME || ''
+    }
     this.claudeBasePath = join(homeDir, '.claude')
     this.projectsPath = join(this.claudeBasePath, 'projects')
   }
@@ -1698,7 +1705,14 @@ export class ClaudeHistoryService {
   // ============================================================================
 
   private getDeletedSessionsConfigPath(): string {
-    const homeDir = app.getPath('home') || process.env.HOME || process.env.USERPROFILE || ''
+    let homeDir: string
+    if (process.platform === 'win32') {
+      // Windows: 优先使用 USERPROFILE 环境变量，避免打包后路径问题
+      homeDir = process.env.USERPROFILE || app.getPath('home') || process.env.HOME || ''
+    } else {
+      // macOS/Linux: 保持原有逻辑
+      homeDir = app.getPath('home') || process.env.HOME || ''
+    }
     const globalConfigDir = join(homeDir, '.neuro-ide-global')
     if (!existsSync(globalConfigDir)) {
       fs.mkdir(globalConfigDir, { recursive: true }).catch(() => {})
