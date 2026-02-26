@@ -64,6 +64,9 @@ Last Updated: Feb 26, 2026
 - **Recursive File Tree**: Infinite nesting, automatic sorting, and real-time file watching via `chokidar`.
 - **Global Search**: Deep file search capability with filename prioritization.
 - **Monaco Editor Support**: Full-featured code editing (VS Code engine) with syntax highlighting and advanced features.
+
+![Text Editor and Diff](public/texteditoranddiff.png)
+
 - **Starred Files**: Quick access to frequently used files and folders with drag-to-reorder support.
 - **Changed Files Tracking**: Automatically tracks modified files for easy review and starring.
 
