@@ -6,10 +6,49 @@ import * as pty from 'node-pty'
 import os from 'os'
 import chokidar from 'chokidar'
 import fs from 'fs/promises'
+import { execSync } from 'child_process'
 import { ConfigManager } from './config'
 import { RecentWorkspacesManager } from './recentWorkspaces'
 import { WorkspacePickerWindow } from './workspacePicker'
 import { claudeHistoryService } from './claudeHistory'
+
+// Helper function to get complete Windows PATH from registry
+function getWindowsPath(): string {
+  try {
+    // Read system-level PATH from registry
+    const systemPathResult = execSync(
+      'reg query "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment" /v Path',
+      { encoding: 'utf8', timeout: 5000 }
+    )
+    const systemPathMatch = systemPathResult.match(/PATH\s+REG_(?:EXPAND_)?SZ\s+(.+)/i)
+    const systemPath = systemPathMatch ? systemPathMatch[1].trim() : ''
+
+    // Read user-level PATH from registry
+    let userPath = ''
+    try {
+      const userPathResult = execSync(
+        'reg query "HKCU\\Environment" /v Path',
+        { encoding: 'utf8', timeout: 5000 }
+      )
+      const userPathMatch = userPathResult.match(/PATH\s+REG_(?:EXPAND_)?SZ\s+(.+)/i)
+      userPath = userPathMatch ? userPathMatch[1].trim() : ''
+    } catch {
+      // User-level PATH may not exist, ignore error
+    }
+
+    // Merge user PATH and system PATH (user PATH first, following Windows convention)
+    const allPaths = [...userPath.split(';'), ...systemPath.split(';')]
+      .filter(Boolean)
+      .map((p) => p.replace(/\\$/g, '')) // Remove trailing backslashes
+
+    // Deduplicate
+    return [...new Set(allPaths)].join(';')
+  } catch (error) {
+    console.error('Failed to read PATH from registry:', error)
+    // Fallback to process.env.PATH or default value
+    return process.env.PATH || 'C:\\Windows\\System32;C:\\Windows'
+  }
+}
 
 // Session Manager
 class SessionManager {
@@ -62,9 +101,9 @@ class SessionManager {
       // Set HOME/USERPROFILE based on platform
       if (isWindows) {
         env.USERPROFILE = process.env.USERPROFILE || os.homedir()
-        if (!env.PATH) {
-          env.PATH = 'C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\Wbem'
-        }
+        // Get complete PATH from Windows registry to ensure all paths are available
+        // This is necessary because packaged Electron apps may not inherit full environment
+        env.PATH = getWindowsPath()
       } else {
         env.HOME = process.env.HOME || os.homedir()
         if (!env.PATH) {
