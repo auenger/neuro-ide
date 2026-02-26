@@ -701,8 +701,8 @@ export class ClaudeHistoryService {
         const parsed = JSON.parse(content)
         if (parsed.originalPath && parsed.originalPath.length > 0) {
           const original = parsed.originalPath as string
-          // Validate it's an absolute path
-          if (original.startsWith('/')) {
+          // Validate it's an absolute path (Unix: /path or Windows: D:\path)
+          if (original.startsWith('/') || /^[A-Za-z]:[\\\/]/.test(original)) {
             return original
           }
         }
@@ -720,7 +720,16 @@ export class ClaudeHistoryService {
       return result
     }
 
-    // Final fallback: simple replacement
+    // 3. Final fallback: simple replacement
+    // Check if it looks like a Windows path (starts with drive letter like D-)
+    const windowsMatch = decoded.match(/^([A-Za-z])-(.*)$/)
+    if (windowsMatch) {
+      const driveLetter = windowsMatch[1]
+      const restPath = windowsMatch[2].replace(/-/g, '\\')
+      return `${driveLetter}:\\${restPath}`
+    }
+
+    // Unix path fallback
     return '/' + decoded.replace(/-/g, '/')
   }
 
@@ -748,6 +757,10 @@ export class ClaudeHistoryService {
       return null
     }
 
+    // Detect if this is a Windows path (starts with drive letter like D-)
+    const isWindows = process.platform === 'win32' || /^[A-Za-z]-/.test(encoded)
+    const separator = isWindows ? '\\' : '/'
+
     // Find all hyphen positions
     const hyphenPositions: number[] = []
     for (let i = 0; i < encoded.length; i++) {
@@ -763,7 +776,18 @@ export class ClaudeHistoryService {
         continue
       }
 
-      const candidate = basePath.length === 0 ? '/' + segment : basePath + '/' + segment
+      // Build candidate path
+      let candidate: string
+      if (basePath.length === 0) {
+        // First segment - could be drive letter (Windows) or root directory (Unix)
+        if (isWindows && segment.length === 1 && /[A-Za-z]/.test(segment)) {
+          candidate = segment + ':' // e.g., "D:"
+        } else {
+          candidate = separator + segment // e.g., "/Users"
+        }
+      } else {
+        candidate = basePath + separator + segment
+      }
 
       // Check if this path exists and is a directory
       try {
@@ -777,7 +801,7 @@ export class ClaudeHistoryService {
           }
 
           // First try: remaining as a single leaf (no more splitting needed)
-          const fullPath = candidate + '/' + remaining
+          const fullPath = candidate + separator + remaining.replace(/-/g, separator)
           if (existsSync(fullPath)) {
             try {
               const fullStats = statSync(fullPath)
@@ -802,7 +826,7 @@ export class ClaudeHistoryService {
 
     // No hyphen worked as separator - treat entire encoded as a single segment
     if (basePath.length > 0) {
-      const fullPath = basePath + '/' + encoded
+      const fullPath = basePath + separator + encoded.replace(/-/g, separator)
       if (existsSync(fullPath)) {
         return fullPath
       }

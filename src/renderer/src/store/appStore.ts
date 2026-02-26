@@ -2,14 +2,21 @@ import { create } from 'zustand'
 
 export type Role = 'neuro' | string
 
+// Init command configuration
+export interface InitCommand {
+  id: string
+  command: string
+  delay: number // Delay in seconds after execution (0 = no delay)
+  groupWithNext: boolean // Whether to chain with next command using &&
+}
+
 export interface RoleConfig {
   id: string
   name: string
   icon: string
   prompt: string // Markdown format prompt
   customPrompt?: string // Custom terminal PS1
-  initCommands?: string[] // Terminal initialization commands
-  stopOnFailure?: boolean // Stop execution on command failure, default true
+  initCommands?: InitCommand[] // Terminal initialization commands
   isBuiltIn: boolean
   isActive: boolean
 }
@@ -21,8 +28,7 @@ export interface Session {
   icon: string
   prompt: string
   customPrompt?: string
-  initCommands?: string[]
-  stopOnFailure?: boolean
+  initCommands?: InitCommand[]
   ptyPid?: number
   terminals: TerminalInstance[] // Multiple terminal instances
   activeTerminalId: string // Currently active terminal in this session
@@ -216,7 +222,6 @@ const createSession = (role: RoleConfig): Session => {
     prompt: role.prompt,
     customPrompt: role.customPrompt,
     initCommands: role.initCommands,
-    stopOnFailure: role.stopOnFailure ?? true,
     terminals: [
       {
         id: terminalId,

@@ -4,11 +4,24 @@
 }
 
 .resize-handle-horizontal {
-  height: 4px;
-  background: var(--cc-border-primary);
+  height: 6px;
+  background: var(--cc-bg-tertiary);
   cursor: row-resize;
   transition: all var(--transition-base);
   position: relative;
+}
+
+.resize-handle-horizontal::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 3px;
+  background: var(--cc-border-secondary);
+  border-radius: 2px;
+  transition: all var(--transition-base);
 }
 
 .resize-handle-horizontal::after {
@@ -25,7 +38,12 @@
 }
 
 .resize-handle-horizontal:hover {
+  background: var(--cc-bg-tertiary);
+}
+
+.resize-handle-horizontal:hover::before {
   background: var(--cc-accent-primary);
+  width: 60px;
 }
 
 .resize-handle-horizontal:hover::after {
@@ -35,6 +53,12 @@
 
 .resize-handle-horizontal:active {
   background: var(--cc-accent-secondary);
+}
+
+.resize-handle-horizontal.disabled {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 /* Markdown Panel */

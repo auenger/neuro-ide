@@ -1,11 +1,165 @@
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useAppStore } from '../store/appStore'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { useAppStore, InitCommand } from '../store/appStore'
 import Toast from './Toast'
 import './MarkdownEditor.css'
 
 type EditorTab = 'prompt' | 'init'
+
+// Generate unique ID for init commands
+const generateCommandId = () => `cmd-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+// Create default empty command
+const createEmptyCommand = (): InitCommand => ({
+  id: generateCommandId(),
+  command: '',
+  delay: 1,
+  groupWithNext: false
+})
+
+// Convert legacy string[] format to new InitCommand[] format
+const normalizeInitCommands = (commands: any): InitCommand[] => {
+  if (!commands || !Array.isArray(commands)) return []
+
+  // Check if it's the new format (array of objects with 'command' property)
+  if (commands.length > 0 && typeof commands[0] === 'object' && 'command' in commands[0]) {
+    return commands as InitCommand[]
+  }
+
+  // Convert legacy string[] format to new format
+  return (commands as string[])
+    .filter((cmd) => typeof cmd === 'string' && cmd.trim().length > 0)
+    .map((cmd) => ({
+      id: generateCommandId(),
+      command: cmd,
+      delay: 1,
+      groupWithNext: false
+    }))
+}
+
+// Sortable Command Item Component
+const SortableCommandItem = ({
+  cmd,
+  index,
+  executingIndex,
+  initCommands,
+  onUpdate,
+  onRemove,
+  isDragging
+}: {
+  cmd: InitCommand
+  index: number
+  executingIndex: number | null
+  initCommands: InitCommand[]
+  onUpdate: (id: string, field: keyof InitCommand, value: any) => void
+  onRemove: (id: string) => void
+  isDragging: boolean
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition
+  } = useSortable({ id: cmd.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  }
+
+  const isExecutingThis =
+    executingIndex !== null &&
+    index >= executingIndex &&
+    (index === executingIndex || initCommands.slice(executingIndex, index).every((c) => c.groupWithNext))
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`init-command-item ${isExecutingThis ? 'executing' : ''} ${isDragging ? 'dragging' : ''}`}
+    >
+      {/* Drag handle */}
+      <div className="col-drag" {...attributes} {...listeners}>
+        <svg viewBox="0 0 24 24" fill="currentColor" className="drag-handle">
+          <circle cx="9" cy="6" r="1.5" />
+          <circle cx="15" cy="6" r="1.5" />
+          <circle cx="9" cy="12" r="1.5" />
+          <circle cx="15" cy="12" r="1.5" />
+          <circle cx="9" cy="18" r="1.5" />
+          <circle cx="15" cy="18" r="1.5" />
+        </svg>
+      </div>
+
+      <div className="col-command">
+        <input
+          type="text"
+          value={cmd.command}
+          onChange={(e) => onUpdate(cmd.id, 'command', e.target.value)}
+          placeholder="输入命令..."
+          spellCheck={false}
+        />
+      </div>
+
+      <div className="col-delay">
+        <input
+          type="number"
+          value={cmd.delay}
+          onChange={(e) => onUpdate(cmd.id, 'delay', parseFloat(e.target.value) || 0)}
+          min="0"
+          max="60"
+          step="0.5"
+        />
+        <button
+          className={`btn-instant ${cmd.delay === 0 ? 'active' : ''}`}
+          onClick={() => onUpdate(cmd.id, 'delay', 0)}
+          title="无延迟"
+        >
+          0s
+        </button>
+      </div>
+
+      <div className="col-group">
+        <div
+          className={`toggle-switch-small ${cmd.groupWithNext ? 'checked' : ''}`}
+          onClick={() => onUpdate(cmd.id, 'groupWithNext', !cmd.groupWithNext)}
+          title="与下一条命令连续执行 (用 && 连接)"
+        >
+          <div className="toggle-knob-small"></div>
+        </div>
+      </div>
+
+      <div className="col-actions">
+        <button
+          className="btn-small btn-danger"
+          onClick={() => onRemove(cmd.id)}
+          title="删除"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  )
+}
 
 const MarkdownEditor = ({
   isCollapsed,
@@ -32,11 +186,10 @@ const MarkdownEditor = ({
   const [markdown, setMarkdown] = useState(activeSession?.prompt || '')
   const [isPromptSaved, setIsPromptSaved] = useState(true)
 
-  // Init commands editor state
-  const [initCommands, setInitCommands] = useState<string>(
-    activeSession?.initCommands?.join('\n') || ''
+  // Init commands editor state - normalize legacy format
+  const [initCommands, setInitCommands] = useState<InitCommand[]>(
+    normalizeInitCommands(activeSession?.initCommands)
   )
-  const [stopOnFailure, setStopOnFailure] = useState(activeSession?.stopOnFailure ?? true)
   const [isInitSaved, setIsInitSaved] = useState(true)
 
   // Combined unsaved state
@@ -46,6 +199,25 @@ const MarkdownEditor = ({
     message: string
     type: 'success' | 'info' | 'warning'
   } | null>(null)
+
+  // Execution state
+  const [isExecuting, setIsExecuting] = useState(false)
+  const [executingIndex, setExecutingIndex] = useState<number | null>(null)
+
+  // Dragging state
+  const [draggingId, setDraggingId] = useState<string | null>(null)
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5
+      }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  )
 
   // Register unsaved changes check
   useEffect(() => {
@@ -63,8 +235,7 @@ const MarkdownEditor = ({
   useEffect(() => {
     if (activeSession) {
       setMarkdown(activeSession.prompt)
-      setInitCommands(activeSession.initCommands?.join('\n') || '')
-      setStopOnFailure(activeSession.stopOnFailure ?? true)
+      setInitCommands(normalizeInitCommands(activeSession.initCommands))
       setIsPromptSaved(true)
       setIsInitSaved(true)
     }
@@ -77,14 +248,38 @@ const MarkdownEditor = ({
   }
 
   // Init commands handlers
-  const handleInitCommandsChange = (value: string) => {
-    setInitCommands(value)
+  const handleAddCommand = () => {
+    setInitCommands([...initCommands, createEmptyCommand()])
     setIsInitSaved(false)
   }
 
-  const handleStopOnFailureChange = (value: boolean) => {
-    setStopOnFailure(value)
+  const handleRemoveCommand = (id: string) => {
+    setInitCommands(initCommands.filter((cmd) => cmd.id !== id))
     setIsInitSaved(false)
+  }
+
+  const handleUpdateCommand = (id: string, field: keyof InitCommand, value: any) => {
+    setInitCommands(
+      initCommands.map((cmd) => (cmd.id === id ? { ...cmd, [field]: value } : cmd))
+    )
+    setIsInitSaved(false)
+  }
+
+  // DnD handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    setDraggingId(String(event.active.id))
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    setDraggingId(null)
+
+    if (over && active.id !== over.id) {
+      const oldIndex = initCommands.findIndex((cmd) => cmd.id === String(active.id))
+      const newIndex = initCommands.findIndex((cmd) => cmd.id === String(over.id))
+      setInitCommands(arrayMove(initCommands, oldIndex, newIndex))
+      setIsInitSaved(false)
+    }
   }
 
   // Save handler
@@ -97,11 +292,8 @@ const MarkdownEditor = ({
       }
 
       if (!isInitSaved) {
-        updates.initCommands = initCommands
-          .split('\n')
-          .map((cmd) => cmd.trim())
-          .filter((cmd) => cmd.length > 0)
-        updates.stopOnFailure = stopOnFailure
+        // Filter out empty commands before saving
+        updates.initCommands = initCommands.filter((cmd) => cmd?.command?.trim()?.length > 0)
       }
 
       if (Object.keys(updates).length > 0) {
@@ -119,12 +311,7 @@ const MarkdownEditor = ({
         await navigator.clipboard.writeText(markdown)
       } else {
         // For init tab, copy the generated script
-        const commands = initCommands
-          .split('\n')
-          .map((cmd) => cmd.trim())
-          .filter((cmd) => cmd.length > 0)
-        const connector = stopOnFailure ? ' && ' : ' ; '
-        const script = commands.join(connector)
+        const script = generateExecutionScript()
         await navigator.clipboard.writeText(script)
       }
       setToast({ message: '已复制到剪贴板', type: 'success' })
@@ -134,38 +321,92 @@ const MarkdownEditor = ({
     }
   }
 
+  // Generate execution script for display - with line breaks for delays
+  const generateExecutionScript = (): string => {
+    const validCommands = initCommands.filter((cmd) => cmd?.command?.trim()?.length > 0)
+    if (validCommands.length === 0) return ''
+
+    const lines: string[] = []
+    let currentGroup: string[] = []
+
+    validCommands.forEach((cmd, index) => {
+      currentGroup.push(cmd.command)
+      if (!cmd.groupWithNext || index === validCommands.length - 1) {
+        // Join group with &&, add delay annotation if needed
+        const groupScript = currentGroup.join(' && ')
+        const delayAnnotation = cmd.delay > 0 ? `  # wait ${cmd.delay}s` : ''
+        lines.push(groupScript + delayAnnotation)
+        currentGroup = []
+      }
+    })
+
+    return lines.join('\n')
+  }
+
+  // Execute commands with delays
   const handleInit = async () => {
+    const validCommands = initCommands.filter((cmd) => cmd?.command?.trim()?.length > 0)
+
+    if (validCommands.length === 0) {
+      setToast({ message: '没有配置初始化命令', type: 'warning' })
+      return
+    }
+
+    const activeTerminalId = activeSession?.activeTerminalId
+    if (!activeTerminalId) {
+      setToast({ message: '未找到活跃终端', type: 'warning' })
+      return
+    }
+
+    setIsExecuting(true)
+
+    // Group commands: consecutive commands with groupWithNext=true are executed together
+    const groups: { commands: string[]; delay: number; originalIndex: number }[] = []
+    let currentGroup: string[] = []
+    let groupStartIndex = 0
+
+    validCommands.forEach((cmd, index) => {
+      if (currentGroup.length === 0) {
+        groupStartIndex = index
+      }
+      currentGroup.push(cmd.command)
+
+      if (!cmd.groupWithNext || index === validCommands.length - 1) {
+        // Get the delay from the last command in the group
+        const lastCmd = validCommands[index]
+        groups.push({
+          commands: currentGroup,
+          delay: lastCmd.delay || 0,
+          originalIndex: groupStartIndex
+        })
+        currentGroup = []
+      }
+    })
+
     try {
-      // Generate init script
-      const commands = initCommands
-        .split('\n')
-        .map((cmd) => cmd.trim())
-        .filter((cmd) => cmd.length > 0)
+      for (let i = 0; i < groups.length; i++) {
+        const group = groups[i]
+        setExecutingIndex(group.originalIndex)
 
-      if (commands.length === 0) {
-        setToast({ message: '没有配置初始化命令', type: 'warning' })
-        return
+        // Join commands in group with &&
+        const script = group.commands.join(' && ')
+
+        // Send to terminal
+        window.api.session.input(activeTerminalId, script + '\r')
+
+        // Wait for delay (if not the last group)
+        if (group.delay > 0 && i < groups.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, group.delay * 1000))
+        }
       }
 
-      const connector = stopOnFailure ? ' && ' : ' ; '
-      const initScript = commands.join(connector)
-
-      // Copy to clipboard
-      await navigator.clipboard.writeText(initScript)
-
-      // Get active terminal ID
-      const activeTerminalId = activeSession?.activeTerminalId
-
-      if (activeTerminalId) {
-        // Send to terminal with auto enter
-        window.api.session.input(activeTerminalId, initScript + '\r')
-        setToast({ message: '已发送到终端', type: 'success' })
-      } else {
-        setToast({ message: '已复制，但未找到活跃终端', type: 'warning' })
-      }
+      setToast({ message: '初始化命令执行完成', type: 'success' })
     } catch (err) {
-      console.error('Failed to init:', err)
-      setToast({ message: '发送失败', type: 'warning' })
+      console.error('Failed to execute init commands:', err)
+      setToast({ message: '执行失败', type: 'warning' })
+    } finally {
+      setIsExecuting(false)
+      setExecutingIndex(null)
     }
   }
 
@@ -247,7 +488,12 @@ const MarkdownEditor = ({
               </svg>
             </button>
             {editorTab === 'init' && (
-              <button className="btn-icon" onClick={handleInit} title="执行初始化">
+              <button
+                className={`btn-icon ${isExecuting ? 'executing' : ''}`}
+                onClick={handleInit}
+                title="执行初始化"
+                disabled={isExecuting}
+              >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
@@ -308,28 +554,76 @@ const MarkdownEditor = ({
               )}
             </>
           ) : (
-            // Init Commands Editor
-            <div className="init-commands-editor">
-              <div className="init-commands-textarea-wrapper">
-                <textarea
-                  value={initCommands}
-                  onChange={(e) => handleInitCommandsChange(e.target.value)}
-                  placeholder="每行一条命令，例如：&#10;nvm use 20&#10;claude --dangerously-skip-permissions"
-                  spellCheck={false}
-                />
-              </div>
-              <div className="init-commands-sidebar">
-                <div className="sidebar-section">
-                  <div className="sidebar-label">执行选项</div>
-                  <div
-                    className="toggle-switch-wrapper"
-                    onClick={() => handleStopOnFailureChange(!stopOnFailure)}
-                  >
-                    <div className={`toggle-switch ${stopOnFailure ? 'checked' : ''}`}>
-                      <div className="toggle-knob"></div>
-                    </div>
-                    <span>失败后停止</span>
+            // Init Commands Editor - New List-based UI with DnD
+            <div className="init-commands-editor-v2">
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+              >
+                <div className="init-commands-list">
+                  {/* Header */}
+                  <div className="init-commands-header">
+                    <div className="col-drag"></div>
+                    <div className="col-command">命令</div>
+                    <div className="col-delay">延迟</div>
+                    <div className="col-group">连续</div>
+                    <div className="col-actions">操作</div>
                   </div>
+
+                  {/* Command items with DnD */}
+                  <SortableContext
+                    items={initCommands.map((cmd) => cmd.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="init-commands-items">
+                      {initCommands.map((cmd, index) => (
+                        <SortableCommandItem
+                          key={cmd.id}
+                          cmd={cmd}
+                          index={index}
+                          executingIndex={executingIndex}
+                          initCommands={initCommands}
+                          onUpdate={handleUpdateCommand}
+                          onRemove={handleRemoveCommand}
+                          isDragging={draggingId === cmd.id}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+
+                  {/* Add button */}
+                  <button className="btn-add-command" onClick={handleAddCommand}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    添加命令
+                  </button>
+                </div>
+              </DndContext>
+
+              {/* Preview panel */}
+              <div className="init-commands-preview">
+                <div className="preview-label">执行预览:</div>
+                <div className="preview-content">
+                  {initCommands.filter((c) => c?.command?.trim()).length > 0 ? (
+                    <pre>{generateExecutionScript()}</pre>
+                  ) : (
+                    <span className="preview-empty">暂无命令</span>
+                  )}
+                </div>
+                <div className="preview-help">
+                  <p>
+                    <strong>拖拽</strong>: 拖动左侧手柄调整顺序
+                  </p>
+                  <p>
+                    <strong>0s</strong>: 快速设置为无延迟
+                  </p>
+                  <p>
+                    <strong>连续</strong>: 与下一条命令用 <code>&&</code> 连接
+                  </p>
                 </div>
               </div>
             </div>
